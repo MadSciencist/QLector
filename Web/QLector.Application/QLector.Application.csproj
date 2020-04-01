@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="9.0.0-preview3" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="9.0.0-preview3" />
+    <PackageReference Include="MediatR" Version="8.0.1" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\QLector.Domain.Abstractions\QLector.Domain.Abstractions.csproj" />
+    <ProjectReference Include="..\QLector.Domain\QLector.Domain.csproj" />
+    <ProjectReference Include="..\QLector.Entities\QLector.Entities.csproj" />
+    <ProjectReference Include="..\QLector.Security\QLector.Security.csproj" />
+  </ItemGroup>
+
+</Project>
