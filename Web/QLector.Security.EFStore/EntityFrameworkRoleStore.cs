@@ -20,11 +20,6 @@ namespace QLector.Security.EFStore
             throw new NotImplementedException();
         }
 
-        public void Dispose()
-        {
-            Console.WriteLine("Disposing");
-        }
-
         public Task<Role> FindByIdAsync(string roleId, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
@@ -63,6 +58,10 @@ namespace QLector.Security.EFStore
         public Task<IdentityResult> UpdateAsync(Role role, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
+        }
+
+        public void Dispose()
+        {
         }
     }
 }

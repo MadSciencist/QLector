@@ -1,14 +1,15 @@
 ﻿using MediatR;
-using QLector.Application.Commands.Login;
+using QLector.Application.Commands.User;
 using QLector.Application.ResponseModels;
-using QLector.Domain.Infrastructure.Exceptions;
+using QLector.Application.ResponseModels.User;
 using QLector.Security;
 using QLector.Security.Dto;
+using QLector.Security.Exceptions;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace QLector.Application.Handlers
+namespace QLector.Application.Handlers.User
 {
     public class LoginHandler : IRequestHandler<LoginCommand, Response<UserLoggedResponseModel>>
     {
@@ -31,20 +32,19 @@ namespace QLector.Application.Handlers
                 {
                     Token = tokenDto.Token,
                     ValidTo = tokenDto.ValidTo,
-                    IssuedAt = tokenDto.IssuedAt
+                    IssuedAt = tokenDto.IssuedAt,
+                    Id = tokenDto.UserId,
                 };
             }
             catch (UnauthorizedAccessException ex)
             {
                 // handle
+                throw;
             }
             catch (UserNotExistsException ex)
             {
                 Console.WriteLine("not exissts");
-            }
-            catch (NotFoundException ex)
-            {
-                // handle
+                throw;
             }
 
             return result;

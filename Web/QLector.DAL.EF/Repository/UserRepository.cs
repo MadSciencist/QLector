@@ -11,6 +11,13 @@ namespace QLector.DAL.EF.Repository
         {
         }
 
+        public async Task<User> FindByEmail(string email)
+        {
+            return await Context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.NormalizedEmail == email);
+        }
+
         public async Task<User> FindByUserName(string userName)
         {
             return await Context.Users

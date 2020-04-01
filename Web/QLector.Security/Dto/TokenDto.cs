@@ -7,5 +7,6 @@ namespace QLector.Security.Dto
         public string Token { get; set; }
         public DateTime ValidTo{ get; set; }
         public DateTime IssuedAt { get; set; }
+        public int UserId { get; set; }
     }
 }

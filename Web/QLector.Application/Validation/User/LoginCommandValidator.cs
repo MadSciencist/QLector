@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using QLector.Application.Commands.Login;
+using QLector.Application.Commands.User;
 
-namespace QLector.Application.Validation
+namespace QLector.Application.Validation.User
 {
     public class LoginCommandValidator : AbstractValidator<LoginCommand>
     {

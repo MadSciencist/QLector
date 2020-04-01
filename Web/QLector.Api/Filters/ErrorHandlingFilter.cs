@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using QLector.Application.Extensions;
 using QLector.Application.ResponseModels;
+using QLector.Security.Exceptions;
+using System;
 using System.Linq;
 
 namespace QLector.Api.Filters
@@ -32,12 +34,30 @@ namespace QLector.Api.Filters
                 context.ExceptionHandled = true;
                 return;
             }
+            else if(context.Exception is NotFoundException ex)
+            {
+                context.Result = new ObjectResult(new object())
+                {
+                    StatusCode = StatusCodes.Status404NotFound
+                };
+                context.ExceptionHandled = true;
+                return;
+            }
+            else if(context.Exception is UnauthorizedAccessException)
+            {
+                context.Result = new ObjectResult(new object())
+                {
+                    StatusCode = StatusCodes.Status401Unauthorized
+                };
+                context.ExceptionHandled = true;
+                return;
+            }
 
             // TODO refactor, enrich problem details, hide details for not auth/admins
             var response = Response<object>.FromError(context?.Exception?.Message, new ProblemDetails
             {
                 Type = context.HttpContext.Request.Path,
-                Status = 500,
+                Status = StatusCodes.Status500InternalServerError,
                 Title = context?.Exception?.Message,
                 Detail = context?.Exception?.ToString(),
             });

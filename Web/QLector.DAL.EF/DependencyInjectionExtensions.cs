@@ -19,7 +19,7 @@ namespace QLector.DAL.EF
                 {
                     options.UseSqlServer(config["ConnectionString"]);
 
-                }, ServiceLifetime.Transient);
+                }, ServiceLifetime.Scoped);
         }
     }
 }

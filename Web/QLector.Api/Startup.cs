@@ -1,4 +1,3 @@
-using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -6,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json.Converters;
 using QLector.Api.Filters;
-using QLector.Application.Behaviors;
 using QLector.Application.Extensions;
 using QLector.DAL.EF;
 using QLector.Security;
@@ -29,9 +27,7 @@ namespace QLector.Api
                 .AddNewtonsoftJson(o => o.SerializerSettings.Converters.Add(new StringEnumConverter()));
 
             services
-                .RegisterMediator()
-                .RegisterBehavior(typeof(ValidationBehavior<,>))
-                .AddValidatorsFromAssembly(typeof(Startup).Assembly)
+                .RegisterApplicationLayer()
                 .AddJwtTokenBuilder()
                 .AddUserService()
                 .AddEntityFrameworkIdentity()

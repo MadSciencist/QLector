@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using QLector.Domain.Infrastructure.Exceptions;
 using QLector.Entities.Entity;
 using QLector.Security.Dto;
+using QLector.Security.Exceptions;
+using QLector.Security.Exceptions.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -27,9 +28,7 @@ namespace QLector.Security
             var user = await _userManager.FindByNameAsync(loginDto.Login);
 
             if (user is null)
-            {
                 throw new UserNotExistsException();
-            }
 
             await _signInManager.SignOutAsync(); // terminate existing session
 
@@ -44,10 +43,32 @@ namespace QLector.Security
 
             return new TokenDto
             {
+                UserId = user.Id,
                 Token = token,
                 ValidTo = validTo,
                 IssuedAt = DateTime.UtcNow
             };
+        }
+
+        public async Task<User> Register(RegisterDto registerDto)
+        {
+            var alreadyExistingUser = await _userManager.FindByNameAsync(registerDto.UserName);
+
+            if (alreadyExistingUser != null)
+                throw new UserAlreadyExistsException();
+
+            var user = new User
+            {
+                UserName = registerDto.UserName,
+                Email = registerDto.Email,
+            };
+
+            var createUserResult = await _userManager.CreateAsync(user, registerDto.Password);
+
+            if (!createUserResult.Succeeded)
+                throw new UserCreationException(createUserResult.Errors);
+
+            return user;
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using QLector.Application.Commands;
-using QLector.Application.Commands.Login;
+using QLector.Application.Commands.User;
 using System.Threading.Tasks;
 
 namespace QLector.Api.Controllers
@@ -20,6 +19,12 @@ namespace QLector.Api.Controllers
         public async Task<IActionResult> Login(LoginCommand loginCommand)
         {
             return Ok(await _mediator.Send(loginCommand));
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register(RegisterUserCommand registerUserCommand)
+        {
+            return Ok(await _mediator.Send(registerUserCommand));
         }
     }
 }

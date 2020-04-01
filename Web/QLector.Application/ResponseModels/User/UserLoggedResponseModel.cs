@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace QLector.Application.ResponseModels
+namespace QLector.Application.ResponseModels.User
 {
     public class UserLoggedResponseModel
     {

@@ -6,9 +6,10 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
+// Thank you MS for those fatty interfaces
 namespace QLector.Security.EFStore
 {
-    public class EntityFrameworkUserStore : IUserStore<User>, IUserPasswordStore<User>
+    public class EntityFrameworkUserStore : IUserEmailStore<User>, IUserPasswordStore<User>
     {
         private readonly IUnitOfWork _unitofWork;
         private readonly IUserRepository _userRepository;
@@ -19,14 +20,32 @@ namespace QLector.Security.EFStore
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         }
 
-        public Task<IdentityResult> CreateAsync(User user, CancellationToken cancellationToken)
+        public async Task<IdentityResult> CreateAsync(User user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _userRepository.Add(user);
+                await _unitofWork.Commit();
+                return IdentityResult.Success;
+            }
+            catch (Exception ex)
+            {
+                return IdentityResult.Failed(new IdentityError { Code = nameof(CreateAsync), Description = ex.Message });
+            }
         }
 
-        public Task<IdentityResult> DeleteAsync(User user, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
+        public async Task<IdentityResult> DeleteAsync(User user, CancellationToken cancellationToken)
+        {           
+            try
+            {
+                await _userRepository.Remove(user);
+                await _unitofWork.Commit();
+                return IdentityResult.Success;
+            }
+            catch(Exception ex)
+            {
+                return IdentityResult.Failed(new IdentityError { Code = nameof(DeleteAsync), Description = ex.Message });
+            }
         }
 
         public async Task<User> FindByIdAsync(string userId, CancellationToken cancellationToken)
@@ -42,13 +61,13 @@ namespace QLector.Security.EFStore
 
         public Task<string> GetNormalizedUserNameAsync(User user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(user.NormalizedUserName);
         }
 
         public async Task<string> GetPasswordHashAsync(User user, CancellationToken cancellationToken)
         {
             var entity = await _userRepository.FindById(user.Id);
-            return entity?.PasswordHash; // TODO hashing/salting
+            return entity?.PasswordHash;
         }
 
         public async Task<string> GetUserIdAsync(User user, CancellationToken cancellationToken)
@@ -59,32 +78,82 @@ namespace QLector.Security.EFStore
 
         public Task<string> GetUserNameAsync(User user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(user.UserName);
         }
 
         public Task<bool> HasPasswordAsync(User user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(!string.IsNullOrWhiteSpace(user.PasswordHash));
         }
 
         public Task SetNormalizedUserNameAsync(User user, string normalizedName, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            user.NormalizedUserName = normalizedName;
+            return Task.FromResult(0);
         }
 
         public Task SetPasswordHashAsync(User user, string passwordHash, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            user.PasswordHash = passwordHash; // TODO
+            return Task.FromResult(0);
         }
 
         public Task SetUserNameAsync(User user, string userName, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            user.UserName = userName;
+            return Task.FromResult(0);
         }
 
-        public Task<IdentityResult> UpdateAsync(User user, CancellationToken cancellationToken)
+        public async Task<IdentityResult> UpdateAsync(User user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _userRepository.Update(user);
+                await _unitofWork.Commit();
+                return IdentityResult.Success;
+            }
+            catch (Exception ex)
+            {
+                return IdentityResult.Failed(new IdentityError { Code = nameof(UpdateAsync), Description = ex.Message });
+            }
+        }
+
+        public Task SetEmailAsync(User user, string email, CancellationToken cancellationToken)
+        {
+            user.Email = email;
+            return Task.FromResult(0);
+        }
+
+        public Task<string> GetEmailAsync(User user, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(user.Email);
+        }
+
+        public Task<bool> GetEmailConfirmedAsync(User user, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(user.EmailConfirmed);
+        }
+
+        public Task SetEmailConfirmedAsync(User user, bool confirmed, CancellationToken cancellationToken)
+        {
+            user.EmailConfirmed = confirmed;
+            return Task.FromResult(0);
+        }
+
+        public async Task<User> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+        {
+            return await _userRepository.FindByEmail(normalizedEmail);
+        }
+
+        public Task<string> GetNormalizedEmailAsync(User user, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(user.NormalizedEmail);
+        }
+
+        public Task SetNormalizedEmailAsync(User user, string normalizedEmail, CancellationToken cancellationToken)
+        {
+            user.NormalizedEmail = normalizedEmail;
+            return Task.FromResult(0);
         }
 
         // DI container will control lifetime

@@ -6,3 +6,15 @@ accept: application/json
     "login": "iDontExist",
     "password": "fail"
 }
+
+###
+
+POST http://localhost:5005/api/user/register HTTP/1.1
+content-type: application/json
+accept: application/json
+
+{
+    "userName": "matty",
+    "password": "passw1",
+    "email": "matty@matty.com"
+}
