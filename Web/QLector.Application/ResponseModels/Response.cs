@@ -17,6 +17,11 @@ namespace QLector.Application.ResponseModels
         [JsonIgnore]
         public int? ResponseStatusCodeOverride { get; set; }
 
+        public Response()
+        {
+            Messages = new List<Message>();
+        }
+
         public Response<TData> AddError(string error)
         {
             Messages.Add(new Message

@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using QLector.Domain.Abstractions.Repository;
-using QLector.Entities.Entity;
+using QLector.Domain.Abstractions.Repository.Users;
+using QLector.Entities.Entity.Users;
 using System.Threading.Tasks;
 
-namespace QLector.DAL.EF.Repository
+namespace QLector.DAL.EF.Repository.Users
 {
     public class UserRepository : EntityFrameworkRepository<User, int>, IUserRepository
     {

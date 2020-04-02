@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using QLector.Domain.Abstractions;
-using QLector.Domain.Abstractions.Repository;
-using QLector.Entities.Entity;
+using QLector.Domain.Abstractions.Repository.Users;
+using QLector.Entities.Entity.Users;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,15 +9,17 @@ using System.Threading.Tasks;
 // Thank you MS for those fatty interfaces
 namespace QLector.Security.EFStore
 {
-    public class EntityFrameworkUserStore : IUserEmailStore<User>, IUserPasswordStore<User>
+    public partial class EntityFrameworkUserStore : IUserEmailStore<User>, IUserPasswordStore<User>
     {
-        private readonly IUnitOfWork _unitofWork;
         private readonly IUserRepository _userRepository;
+        private readonly IUserRoleLinkRepository _userRoleLinkRepository;
+        private readonly IRoleRepository _roleRepository;
 
-        public EntityFrameworkUserStore(IUnitOfWork unitOfWork, IUserRepository userRepository)
+        public EntityFrameworkUserStore(IUserRepository userRepository, IUserRoleLinkRepository userRoleLinkRepository, IRoleRepository roleRepository)
         {
-            _unitofWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
+            _userRoleLinkRepository = userRoleLinkRepository ?? throw new ArgumentNullException(nameof(userRoleLinkRepository));
+            _roleRepository = roleRepository ?? throw new ArgumentNullException(nameof(roleRepository));
         }
 
         public async Task<IdentityResult> CreateAsync(User user, CancellationToken cancellationToken)
@@ -25,7 +27,6 @@ namespace QLector.Security.EFStore
             try
             {
                 await _userRepository.Add(user);
-                await _unitofWork.Commit();
                 return IdentityResult.Success;
             }
             catch (Exception ex)
@@ -39,7 +40,6 @@ namespace QLector.Security.EFStore
             try
             {
                 await _userRepository.Remove(user);
-                await _unitofWork.Commit();
                 return IdentityResult.Success;
             }
             catch(Exception ex)
@@ -109,7 +109,6 @@ namespace QLector.Security.EFStore
             try
             {
                 await _userRepository.Update(user);
-                await _unitofWork.Commit();
                 return IdentityResult.Success;
             }
             catch (Exception ex)
@@ -118,45 +117,6 @@ namespace QLector.Security.EFStore
             }
         }
 
-        public Task SetEmailAsync(User user, string email, CancellationToken cancellationToken)
-        {
-            user.Email = email;
-            return Task.FromResult(0);
-        }
-
-        public Task<string> GetEmailAsync(User user, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(user.Email);
-        }
-
-        public Task<bool> GetEmailConfirmedAsync(User user, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(user.EmailConfirmed);
-        }
-
-        public Task SetEmailConfirmedAsync(User user, bool confirmed, CancellationToken cancellationToken)
-        {
-            user.EmailConfirmed = confirmed;
-            return Task.FromResult(0);
-        }
-
-        public async Task<User> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
-        {
-            return await _userRepository.FindByEmail(normalizedEmail);
-        }
-
-        public Task<string> GetNormalizedEmailAsync(User user, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(user.NormalizedEmail);
-        }
-
-        public Task SetNormalizedEmailAsync(User user, string normalizedEmail, CancellationToken cancellationToken)
-        {
-            user.NormalizedEmail = normalizedEmail;
-            return Task.FromResult(0);
-        }
-
-        // DI container will control lifetime
         public void Dispose()
         {
         }

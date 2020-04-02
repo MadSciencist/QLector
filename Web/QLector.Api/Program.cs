@@ -41,6 +41,8 @@ namespace QLector.Api
             return new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
+                //.WriteTo.File(new CompactJsonFormatter(), "qlectorApi.log")
+                .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Warning)
                 .CreateLogger();
         }
     }

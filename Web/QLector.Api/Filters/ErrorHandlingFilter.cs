@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using QLector.Application.Extensions;
 using QLector.Application.ResponseModels;
-using QLector.Security.Exceptions;
 using System;
 using System.Linq;
 
@@ -30,15 +29,6 @@ namespace QLector.Api.Filters
                 })
                 {
                     StatusCode = StatusCodes.Status400BadRequest
-                };
-                context.ExceptionHandled = true;
-                return;
-            }
-            else if(context.Exception is NotFoundException ex)
-            {
-                context.Result = new ObjectResult(new object())
-                {
-                    StatusCode = StatusCodes.Status404NotFound
                 };
                 context.ExceptionHandled = true;
                 return;

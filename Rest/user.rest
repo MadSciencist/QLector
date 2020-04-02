@@ -1,10 +1,11 @@
+###
 POST http://localhost:5005/api/user/login HTTP/1.1
 content-type: application/json
 accept: application/json
 
 {
-    "login": "iDontExist",
-    "password": "fail"
+    "login": "matty2",
+    "password": "passw1"
 }
 
 ###
@@ -14,7 +15,7 @@ content-type: application/json
 accept: application/json
 
 {
-    "userName": "matty",
+    "userName": "matty2",
     "password": "passw1",
-    "email": "matty@matty.com"
+    "email": "matty@matty2.com"
 }

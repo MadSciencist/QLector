@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using QLector.Application.Commands.User;
 using QLector.Application.ResponseModels.User;
+using QLector.Entities.Entity.Users;
 using QLector.Security.Dto;
-using UserEntity = QLector.Entities.Entity.User;
 
-namespace QLector.Application.Mappings.User
+namespace QLector.Application.Mappings.Users
 {
     public class RegisterMappings : Profile
     {
@@ -12,7 +12,7 @@ namespace QLector.Application.Mappings.User
         {
             CreateMap<RegisterUserCommand, RegisterDto>();
 
-            CreateMap<UserEntity, UserCreatedModel>();
+            CreateMap<User, UserCreatedModel>();
         }
     }
 }

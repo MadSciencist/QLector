@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using QLector.Entities.Entity;
+using QLector.Entities.Entity.Users;
 
 namespace QLector.Security.EFStore
 {

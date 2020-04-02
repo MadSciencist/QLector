@@ -18,13 +18,13 @@ namespace QLector.Api.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginCommand loginCommand)
         {
-            return Ok(await _mediator.Send(loginCommand));
+            return CreateActionResult(await _mediator.Send(loginCommand));
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterUserCommand registerUserCommand)
         {
-            return Ok(await _mediator.Send(registerUserCommand));
+            return CreateActionResult(await _mediator.Send(registerUserCommand));
         }
     }
 }

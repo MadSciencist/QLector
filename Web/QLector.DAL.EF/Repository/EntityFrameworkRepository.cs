@@ -1,6 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using QLector.Domain.Abstractions;
 using QLector.Entities.Entity;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace QLector.DAL.EF.Repository
@@ -19,10 +23,11 @@ namespace QLector.DAL.EF.Repository
             return await Context.Set<TEntity>().FindAsync(id);
         }
 
-        public virtual async Task<TEntity> Add(TEntity entity)
+        public async virtual Task<TEntity> Add(TEntity entity)
         {
-            await Context.AddAsync(entity);
-            return entity;
+            var addResult = await Context.Set<TEntity>().AddAsync(entity);
+            await Context.SaveChangesAsync();
+            return addResult.Entity;
         }
 
         public virtual Task<TEntity> Update(TEntity entity)
@@ -35,6 +40,16 @@ namespace QLector.DAL.EF.Repository
         {
             Context.Remove(entity);
             return Task.FromResult(0);
+        }
+
+        public async Task<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await Context.Set<TEntity>().FirstOrDefaultAsync(predicate);
+        }
+
+        public async Task<IEnumerable<TEntity>> GetManyFiltered(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await Context.Set<TEntity>().Where(predicate).ToListAsync();
         }
     }
 }

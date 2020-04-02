@@ -27,6 +27,7 @@ namespace QLector.Api
                 .AddNewtonsoftJson(o => o.SerializerSettings.Converters.Add(new StringEnumConverter()));
 
             services
+                .AddHttpContextAccessor()
                 .RegisterApplicationLayer()
                 .AddJwtTokenBuilder()
                 .AddUserService()

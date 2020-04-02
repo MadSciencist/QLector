@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Http;
 using QLector.Application.Commands.User;
 using QLector.Application.ResponseModels;
 using QLector.Application.ResponseModels.User;
@@ -36,15 +37,15 @@ namespace QLector.Application.Handlers.User
                     Id = tokenDto.UserId,
                 };
             }
-            catch (UnauthorizedAccessException ex)
+            catch (UnauthorizedAccessException)
             {
-                // handle
-                throw;
+                result.AddError("You are not authorized");
+                result.ResponseStatusCodeOverride = StatusCodes.Status401Unauthorized;
             }
-            catch (UserNotExistsException ex)
+            catch (UserNotExistsException)
             {
-                Console.WriteLine("not exissts");
-                throw;
+                result.AddError("User doess not exists");
+                result.ResponseStatusCodeOverride = StatusCodes.Status404NotFound;
             }
 
             return result;

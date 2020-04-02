@@ -1,23 +1,27 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using QLector.Domain.Abstractions;
+using System;
 using System.Threading.Tasks;
 
 namespace QLector.DAL.EF
 {
     public class EntityFrameworkUnitOfWork : IUnitOfWork
     {
-        private readonly DbContext _context;
+        public Guid TransactionId { get => _transaction.TransactionId; }
+
+        private readonly IDbContextTransaction _transaction;
 
         public EntityFrameworkUnitOfWork(DbContext context)
         {
-            _context = context;
+            _transaction = context.Database.BeginTransaction();
         }
 
         public async Task Commit()
         {
             try
             {
-                 await _context.SaveChangesAsync();
+                await _transaction.CommitAsync();
             }
             catch (DbUpdateConcurrencyException ex)
             {
@@ -31,6 +35,14 @@ namespace QLector.DAL.EF
             }
         }
 
-        public void Dispose() => _context?.Dispose();
+        public async Task Rollback()
+        {
+            await _transaction?.RollbackAsync();
+        }
+
+        public void Dispose()
+        {
+            _transaction?.Dispose();
+        }
     }
 }

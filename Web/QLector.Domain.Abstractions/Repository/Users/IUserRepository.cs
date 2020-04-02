@@ -1,7 +1,7 @@
-﻿using QLector.Entities.Entity;
+﻿using QLector.Entities.Entity.Users;
 using System.Threading.Tasks;
 
-namespace QLector.Domain.Abstractions.Repository
+namespace QLector.Domain.Abstractions.Repository.Users
 {
     public interface IUserRepository : IRepository<User, int>
     {

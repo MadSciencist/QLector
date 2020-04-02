@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using QLector.Entities.Entity;
+using QLector.Entities.Entity.Users;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;

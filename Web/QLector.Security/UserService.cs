@@ -1,10 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using QLector.Entities.Entity;
+using QLector.Domain.Abstractions;
+using QLector.Entities.Entity.Users;
+using QLector.Entities.Enumerations.Users;
 using QLector.Security.Dto;
 using QLector.Security.Exceptions;
 using QLector.Security.Exceptions.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -12,15 +16,19 @@ namespace QLector.Security
 {
     public class UserService : IUserService
     {
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ITokenBuilder _tokenBuilder;
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly RoleManager<Role> _roleManager;
 
-        public UserService(ITokenBuilder tokenBuilder, UserManager<User> userManager, SignInManager<User> signInManager)
+        public UserService(IUnitOfWork unitOfWork, ITokenBuilder tokenBuilder, UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<Role> roleManager)
         {
-            _tokenBuilder = tokenBuilder;
-            _userManager = userManager;
-            _signInManager = signInManager;
+            _unitOfWork = unitOfWork ?? throw new ArgumentException(nameof(unitOfWork));
+            _tokenBuilder = tokenBuilder ?? throw new ArgumentNullException(nameof(tokenBuilder));
+            _userManager = userManager ?? throw new ArgumentNullException(nameof(tokenBuilder));
+            _signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
+            _roleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
         }
 
         public async Task<TokenDto> Login(LoginDto loginDto)
@@ -30,16 +38,16 @@ namespace QLector.Security
             if (user is null)
                 throw new UserNotExistsException();
 
-            await _signInManager.SignOutAsync(); // terminate existing session
-
-            var signInResult = await _signInManager.PasswordSignInAsync(user, loginDto.Password, true, false);
+            var signInResult = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
 
             if (!signInResult.Succeeded)
             {
                 throw new UnauthorizedAccessException("Incorrect login or password");
             }
 
-            var (token, validTo) = _tokenBuilder.Build(user, new List<Claim>());
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var (token, validTo) = _tokenBuilder.Build(user, GetUserClaims(user, roles));
 
             return new TokenDto
             {
@@ -50,23 +58,66 @@ namespace QLector.Security
             };
         }
 
-        public async Task<User> Register(RegisterDto registerDto)
+        private List<Claim> GetUserClaims(User user, IList<string> roles)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Email, user.Email)
+            };
+
+            if(roles != null && roles.Any())
+                claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
+            return claims;
+        }
+
+        public async Task<User> Register(RegisterDto registerDto, string role = Roles.Default)
         {
             var alreadyExistingUser = await _userManager.FindByNameAsync(registerDto.UserName);
 
             if (alreadyExistingUser != null)
                 throw new UserAlreadyExistsException();
 
-            var user = new User
+            User user;
+
+            try
             {
-                UserName = registerDto.UserName,
-                Email = registerDto.Email,
-            };
+                user = new User
+                {
+                    UserName = registerDto.UserName,
+                    Email = registerDto.Email,
+                };
 
-            var createUserResult = await _userManager.CreateAsync(user, registerDto.Password);
+                var createUserResult = await _userManager.CreateAsync(user, registerDto.Password);
 
-            if (!createUserResult.Succeeded)
-                throw new UserCreationException(createUserResult.Errors);
+                if (!createUserResult.Succeeded || user.Id == 0)
+                {
+                    if (createUserResult.Errors.Any())
+                        throw new UserCreationException(createUserResult.Errors);
+
+                    throw new UserCreationException("Could not create user");
+                }
+
+                var addToRoleResult = await _userManager.AddToRoleAsync(user, role);
+
+                if (!addToRoleResult.Succeeded)
+                {
+                    if (createUserResult.Errors.Any())
+                        throw new UserCreationException(createUserResult.Errors);
+
+                    throw new UserCreationException("Could not create user");
+                }
+
+                await _unitOfWork.Commit();
+            }
+            catch(Exception)
+            {
+                await _unitOfWork?.Rollback();
+                throw;
+            }
 
             return user;
         }

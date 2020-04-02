@@ -6,5 +6,7 @@ namespace QLector.Domain.Abstractions
     public interface IUnitOfWork : IDisposable
     {
         Task Commit();
+        Task Rollback();
+        Guid TransactionId { get; }
     }
 }
