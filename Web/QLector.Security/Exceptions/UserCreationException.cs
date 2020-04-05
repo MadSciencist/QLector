@@ -1,18 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
+﻿using System;
 
-namespace QLector.Security.Exceptions.Exceptions
+namespace QLector.Security.Exceptions
 {
     public class UserCreationException : Exception
     {
-        public IEnumerable<IdentityError> Errors { get; }
-
-        public UserCreationException(IEnumerable<IdentityError> errors)
-        {
-            Errors = errors;
-        }
-
         public UserCreationException()
         { }
 

@@ -4,7 +4,7 @@ content-type: application/json
 accept: application/json
 
 {
-    "login": "matty2",
+    "login": "matty5422444",
     "password": "passw1"
 }
 
@@ -15,7 +15,7 @@ content-type: application/json
 accept: application/json
 
 {
-    "userName": "matty2",
+    "userName": "matty54224442",
     "password": "passw1",
-    "email": "matty@matty2.com"
+    "email": "matty@matty42542424.com"
 }

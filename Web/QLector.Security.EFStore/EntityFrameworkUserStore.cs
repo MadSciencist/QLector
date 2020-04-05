@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using QLector.Domain.Abstractions;
 using QLector.Domain.Abstractions.Repository.Users;
 using QLector.Entities.Entity.Users;
@@ -14,12 +15,14 @@ namespace QLector.Security.EFStore
         private readonly IUserRepository _userRepository;
         private readonly IUserRoleLinkRepository _userRoleLinkRepository;
         private readonly IRoleRepository _roleRepository;
+        private readonly ILogger<EntityFrameworkUserStore> _logger;
 
-        public EntityFrameworkUserStore(IUserRepository userRepository, IUserRoleLinkRepository userRoleLinkRepository, IRoleRepository roleRepository)
+        public EntityFrameworkUserStore(ILogger<EntityFrameworkUserStore>  logger, IUserRepository userRepository, IUserRoleLinkRepository userRoleLinkRepository, IRoleRepository roleRepository)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _userRoleLinkRepository = userRoleLinkRepository ?? throw new ArgumentNullException(nameof(userRoleLinkRepository));
             _roleRepository = roleRepository ?? throw new ArgumentNullException(nameof(roleRepository));
+            _logger = logger;
         }
 
         public async Task<IdentityResult> CreateAsync(User user, CancellationToken cancellationToken)
@@ -31,6 +34,7 @@ namespace QLector.Security.EFStore
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, nameof(CreateAsync));
                 return IdentityResult.Failed(new IdentityError { Code = nameof(CreateAsync), Description = ex.Message });
             }
         }
@@ -113,6 +117,7 @@ namespace QLector.Security.EFStore
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, nameof(UpdateAsync));
                 return IdentityResult.Failed(new IdentityError { Code = nameof(UpdateAsync), Description = ex.Message });
             }
         }

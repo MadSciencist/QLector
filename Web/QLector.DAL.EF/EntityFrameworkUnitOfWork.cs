@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Logging;
 using QLector.Domain.Abstractions;
 using System;
 using System.Threading.Tasks;
@@ -8,41 +8,69 @@ namespace QLector.DAL.EF
 {
     public class EntityFrameworkUnitOfWork : IUnitOfWork
     {
-        public Guid TransactionId { get => _transaction.TransactionId; }
+        private Guid _transactionId;
+        public Guid TransactionId { get => _transactionId; }
 
-        private readonly IDbContextTransaction _transaction;
+        private readonly ILogger<EntityFrameworkUnitOfWork> _logger;
+        private readonly AppDbContext _dbContex;
 
-        public EntityFrameworkUnitOfWork(DbContext context)
+        public EntityFrameworkUnitOfWork(AppDbContext context, ILogger<EntityFrameworkUnitOfWork> logger)
         {
-            _transaction = context.Database.BeginTransaction();
+            _dbContex = context ?? throw new ArgumentNullException(nameof(context));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _transactionId = Guid.NewGuid();
         }
 
         public async Task Commit()
         {
             try
             {
-                await _transaction.CommitAsync();
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                // TODO
-                throw;
+                await _dbContex.SaveChangesAsync();
             }
             catch (DbUpdateException ex)
             {
-                // TODO
+                _logger.LogError(ex, nameof(Commit));
                 throw;
             }
         }
 
         public async Task Rollback()
         {
-            await _transaction?.RollbackAsync();
+            try
+            {
+                await DoRollback();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, nameof(Rollback));
+            }
         }
 
-        public void Dispose()
+        private Task DoRollback()
         {
-            _transaction?.Dispose();
+            // TODO check this
+            foreach (var entry in _dbContex.ChangeTracker.Entries())
+            {
+                switch (entry.State)
+                {
+                    case EntityState.Modified:
+                        entry.State = EntityState.Unchanged;
+                        break;
+
+                    case EntityState.Added:
+                        entry.State = EntityState.Detached;
+                        break;
+
+                    case EntityState.Deleted:
+                        entry.Reload();
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
+            return Task.FromResult(0);
         }
     }
 }

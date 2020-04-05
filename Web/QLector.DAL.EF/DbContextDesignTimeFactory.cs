@@ -5,9 +5,9 @@ using System.IO;
 
 namespace QLector.DAL.EF
 {
-    public class DbContextDesignTimeFactory : IDesignTimeDbContextFactory<DbContext>
+    public class DbContextDesignTimeFactory : IDesignTimeDbContextFactory<AppDbContext>
     {
-        public DbContext CreateDbContext(string[] args)
+        public AppDbContext CreateDbContext(string[] args)
         {
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), @"../QLector.API/"))
@@ -17,12 +17,12 @@ namespace QLector.DAL.EF
 
             var connectionString = configuration["ConnectionString"];
 
-            var builder = new DbContextOptionsBuilder<DbContext>()
+            var builder = new DbContextOptionsBuilder<AppDbContext>()
                 .UseSqlServer(connectionString)
                 .EnableSensitiveDataLogging()
                 .EnableDetailedErrors();
 
-            return new DbContext(builder.Options);
+            return new AppDbContext(builder.Options);
         }
     }
 }

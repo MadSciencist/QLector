@@ -17,27 +17,33 @@ namespace QLector.Security.EFStore
             if (role is null)
                 throw new ArgumentNullException($"Role {roleName} doesn't exists");
 
-            await _userRoleLinkRepository.Add(new UserRoleLink { RoleId = role.Id, UserId = user.Id });
+            user.AddToRole(role);
+
+            //await _userRoleLinkRepository.Add(new UserRoleLink { RoleId = role.Id, UserId = user.Id });
         }
 
         public async Task RemoveFromRoleAsync(User user, string roleName, CancellationToken cancellationToken)
         {
-            var role = await _roleRepository.Find(x => x.NormalizedName == roleName);
+            throw new NotImplementedException();
 
-            if (role is null)
-                throw new ArgumentNullException($"Role {roleName} doesn't exists");
+            //var role = await _roleRepository.Find(x => x.NormalizedName == roleName);
 
-            await _userRoleLinkRepository.Remove(new UserRoleLink { UserId = user.Id, RoleId = role.Id });
+            //if (role is null)
+            //    throw new ArgumentNullException($"Role {roleName} doesn't exists");
+
+            //await _userRoleLinkRepository.Remove(new UserRoleLink { UserId = user.Id, RoleId = role.Id });
         }
 
         public async Task<IList<string>> GetRolesAsync(User user, CancellationToken cancellationToken)
         {
-            var roleIds = (await _userRoleLinkRepository.GetManyFiltered(x => x.UserId == user.Id))
-                .Select(x => x.RoleId);
+            throw new NotImplementedException();
 
-            var roles = await _roleRepository.GetManyFiltered(x => roleIds.Contains(x.Id));
+            //var roleIds = (await _userRoleLinkRepository.GetManyFiltered(x => x.UserId == user.Id))
+            //    .Select(x => x.RoleId);
 
-            return !roles.Any() ? new List<string>() : roles.Select(x => x.Name).ToList();
+            //var roles = await _roleRepository.GetManyFiltered(x => roleIds.Contains(x.Id));
+
+            //return !roles.Any() ? new List<string>() : roles.Select(x => x.Name).ToList();
         }
 
         public async Task<bool> IsInRoleAsync(User user, string roleName, CancellationToken cancellationToken)

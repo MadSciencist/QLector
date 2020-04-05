@@ -1,14 +1,16 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Converters;
 using QLector.Api.Filters;
 using QLector.Application.Extensions;
 using QLector.DAL.EF;
 using QLector.Security;
-using QLector.Security.EFStore;
+using System;
+using System.Text;
 
 namespace QLector.Api
 {
@@ -23,25 +25,40 @@ namespace QLector.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers(options =>  options.Filters.Add(new ErrorHandlingFilter()))
-                .AddNewtonsoftJson(o => o.SerializerSettings.Converters.Add(new StringEnumConverter()));
+            services.AddControllers(options => 
+            {
+                options.Filters.Add(new ErrorHandlingFilter());
+            })
+            .AddNewtonsoftJson(o => o.SerializerSettings.Converters.Add(new StringEnumConverter()));
 
             services
                 .AddHttpContextAccessor()
                 .RegisterApplicationLayer()
                 .AddJwtTokenBuilder()
                 .AddUserService()
-                .AddEntityFrameworkIdentity()
-                .AddEntityFrameworkDataAccessImplementation(Configuration);
+                .AddEntityFrameworkDataAccessImplementation(Configuration)
+                .AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        SaveSigninToken = true,
+                        ValidateIssuer = true,
+                        ValidateAudience = false,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = Configuration["Jwt:Issuer"],
+                        ValidAudience = Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
+                        ClockSkew = TimeSpan.FromMinutes(0)
+                    });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
             app.UseRouting()
             .UseAuthentication()
             .UseAuthorization()

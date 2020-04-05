@@ -7,22 +7,14 @@ namespace QLector.DAL.EF.Repository.Users
 {
     public class UserRepository : EntityFrameworkRepository<User, int>, IUserRepository
     {
-        public UserRepository(DbContext context) : base(context)
+        public UserRepository(AppDbContext context) : base(context)
         {
         }
 
-        public async Task<User> FindByEmail(string email)
-        {
-            return await Context.Users
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.NormalizedEmail == email);
-        }
+        public async Task<User> FindByEmail(string email) => await Context.Users
+                .FirstOrDefaultAsync(x => x.Email == email);
 
-        public async Task<User> FindByUserName(string userName)
-        {
-            return await Context.Users
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.NormalizedUserName == userName);
-        }
+        public async Task<User> FindByUserName(string userName) => await Context.Users
+                .FirstOrDefaultAsync(x => x.UserName == userName);
     }
 }

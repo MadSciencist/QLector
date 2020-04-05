@@ -1,10 +1,6 @@
-﻿using MediatR;
-using QLector.Application.ResponseModels;
-using QLector.Application.ResponseModels.User;
-
-namespace QLector.Application.Commands.User
+﻿namespace QLector.Application.Commands.User
 {
-    public class RegisterUserCommand : IRequest<Response<UserCreatedModel>>
+    public class RegisterUserCommand
     {
         public string UserName{ get; set; }
         public string Password { get; set; }

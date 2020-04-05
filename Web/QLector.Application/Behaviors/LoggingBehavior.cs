@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
+using QLector.Application.Commands;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,12 +18,17 @@ namespace QLector.Application.Behaviors
 
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
-            _logger.LogInformation("----- Handling command {Command} ({@Request})", request.GetType().Name, request);
+            _logger.LogInformation("----- Handling command {Command}", request.GetType().Name);
+
+            if(request is Request<TRequest, TResponse> command)
+            {
+                _logger.LogDebug("{@data}", command.Data);
+            }
 
             try
             {
                 var response = await next();
-                _logger.LogInformation("----- Command {Command} handled - response: {@Response}", request.GetType().Name, response);
+                _logger.LogInformation("----- Command {Command} handled", request.GetType().Name);
                 return response;
             }
             catch(Exception ex)

@@ -1,5 +1,5 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
+using QLector.Application.Commands;
 using QLector.Application.Commands.User;
 using QLector.Application.ResponseModels;
 using QLector.Application.ResponseModels.User;
@@ -7,27 +7,26 @@ using QLector.Security;
 using QLector.Security.Dto;
 using QLector.Security.Exceptions;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace QLector.Application.Handlers.User
 {
-    public class LoginHandler : IRequestHandler<LoginCommand, Response<UserLoggedResponseModel>>
+    public class LoginHandler : BaseHandler<LoginCommand, UserLoggedResponseModel>
     {
         private readonly IUserService _userService;
 
-        public LoginHandler(IUserService userService)
+        public LoginHandler(IServiceProvider services, IUserService userService) : base(services)
         {
             _userService = userService;
         }
 
-        public async Task<Response<UserLoggedResponseModel>> Handle(LoginCommand request, CancellationToken cancellationToken)
+        protected override async Task<Response<UserLoggedResponseModel>> Handle(Request<LoginCommand, UserLoggedResponseModel> request)
         {
             var result = new Response<UserLoggedResponseModel>();
 
             try
             {
-                var tokenDto = await _userService.Login(new LoginDto(request.Login, request.Password));
+                var tokenDto = await _userService.Login(new LoginDto(request.Data.Login, request.Data.Password));
 
                 result.Data = new UserLoggedResponseModel
                 {
@@ -37,15 +36,13 @@ namespace QLector.Application.Handlers.User
                     Id = tokenDto.UserId,
                 };
             }
-            catch (UnauthorizedAccessException)
+            catch (UnauthorizedAccessException ex)
             {
-                result.AddError("You are not authorized");
-                result.ResponseStatusCodeOverride = StatusCodes.Status401Unauthorized;
+                result.AddError(ex.Message).SetStatusCodeOverride(StatusCodes.Status401Unauthorized);
             }
-            catch (UserNotExistsException)
+            catch (InvalidLoginAttemptException ex)
             {
-                result.AddError("User doess not exists");
-                result.ResponseStatusCodeOverride = StatusCodes.Status404NotFound;
+                result.AddError(ex.Message).SetStatusCodeOverride(StatusCodes.Status400BadRequest);
             }
 
             return result;

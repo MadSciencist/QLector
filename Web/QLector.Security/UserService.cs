@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using QLector.Domain.Abstractions;
+using QLector.Domain.Abstractions.Repository.Users;
 using QLector.Entities.Entity.Users;
 using QLector.Entities.Enumerations.Users;
 using QLector.Security.Dto;
 using QLector.Security.Exceptions;
-using QLector.Security.Exceptions.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -18,47 +18,57 @@ namespace QLector.Security
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ITokenBuilder _tokenBuilder;
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
-        private readonly RoleManager<Role> _roleManager;
+        private readonly IPasswordHasher<User> _passwordHasher;
+        private readonly IUserRepository _userRepository;
+        private readonly IRoleRepository _roleRepository;
 
-        public UserService(IUnitOfWork unitOfWork, ITokenBuilder tokenBuilder, UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<Role> roleManager)
+        public UserService(IUnitOfWork unitOfWork, ITokenBuilder tokenBuilder, IPasswordHasher<User> passwordHasher, IUserRepository userRepository, IRoleRepository roleRepository)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentException(nameof(unitOfWork));
             _tokenBuilder = tokenBuilder ?? throw new ArgumentNullException(nameof(tokenBuilder));
-            _userManager = userManager ?? throw new ArgumentNullException(nameof(tokenBuilder));
-            _signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
-            _roleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
+            _passwordHasher = passwordHasher ?? throw new ArgumentNullException(nameof(passwordHasher));
+            _userRepository = userRepository ?? throw new ArgumentException(nameof(userRepository));
+            _roleRepository = roleRepository ?? throw new ArgumentException(nameof(roleRepository));
         }
 
         public async Task<TokenDto> Login(LoginDto loginDto)
         {
-            var user = await _userManager.FindByNameAsync(loginDto.Login);
-
-            if (user is null)
-                throw new UserNotExistsException();
-
-            var signInResult = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
-
-            if (!signInResult.Succeeded)
+            try
             {
-                throw new UnauthorizedAccessException("Incorrect login or password");
+                var user = await _userRepository.FindByUserName(loginDto.Login);
+
+                if (user is null)
+                    throw new InvalidLoginAttemptException("User with given credentials doesn't exists");
+
+                var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(user, user.Password, loginDto.Password);
+
+                if (passwordVerificationResult != PasswordVerificationResult.Success)
+                    throw new UnauthorizedAccessException("Invalid credentials");
+
+                var roles = await _roleRepository.GetUserRoles(loginDto.Login);
+
+                var (token, validTo) = _tokenBuilder.Build(user, GetUserClaims(user, roles));
+
+                user.SignIn();
+                await _userRepository.Update(user);
+                await _unitOfWork.Commit();
+
+                return new TokenDto
+                {
+                    UserId = user.Id,
+                    Token = token,
+                    ValidTo = validTo,
+                    IssuedAt = DateTime.UtcNow
+                };
             }
-
-            var roles = await _userManager.GetRolesAsync(user);
-
-            var (token, validTo) = _tokenBuilder.Build(user, GetUserClaims(user, roles));
-
-            return new TokenDto
+            catch (Exception)
             {
-                UserId = user.Id,
-                Token = token,
-                ValidTo = validTo,
-                IssuedAt = DateTime.UtcNow
-            };
+                await _unitOfWork.Rollback();
+                throw;
+            }
         }
 
-        private List<Claim> GetUserClaims(User user, IList<string> roles)
+        private List<Claim> GetUserClaims(User user, IEnumerable<string> roles)
         {
             var claims = new List<Claim>
             {
@@ -68,7 +78,7 @@ namespace QLector.Security
                 new Claim(ClaimTypes.Email, user.Email)
             };
 
-            if(roles != null && roles.Any())
+            if (roles != null && roles.Any())
                 claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
             return claims;
@@ -76,50 +86,30 @@ namespace QLector.Security
 
         public async Task<User> Register(RegisterDto registerDto, string role = Roles.Default)
         {
-            var alreadyExistingUser = await _userManager.FindByNameAsync(registerDto.UserName);
+            var alreadyExistingUser = await _userRepository.FindByUserName(registerDto.UserName.ToUpperInvariant());
 
             if (alreadyExistingUser != null)
-                throw new UserAlreadyExistsException();
+                throw new UserCreationException("User with given username already exists");
 
-            User user;
+            if (await _userRepository.FindByEmail(registerDto.Email) != null)
+                throw new UserCreationException("User with given email already exists");
 
             try
             {
-                user = new User
-                {
-                    UserName = registerDto.UserName,
-                    Email = registerDto.Email,
-                };
+                var passwordHash = _passwordHasher.HashPassword(null, registerDto.Password);
+                var user = User.Create(registerDto.UserName, registerDto.Email, passwordHash);
 
-                var createUserResult = await _userManager.CreateAsync(user, registerDto.Password);
-
-                if (!createUserResult.Succeeded || user.Id == 0)
-                {
-                    if (createUserResult.Errors.Any())
-                        throw new UserCreationException(createUserResult.Errors);
-
-                    throw new UserCreationException("Could not create user");
-                }
-
-                var addToRoleResult = await _userManager.AddToRoleAsync(user, role);
-
-                if (!addToRoleResult.Succeeded)
-                {
-                    if (createUserResult.Errors.Any())
-                        throw new UserCreationException(createUserResult.Errors);
-
-                    throw new UserCreationException("Could not create user");
-                }
-
+                var roleEntity = await _roleRepository.FindByName(role);
+                user.AddToRole(roleEntity);
+                await _userRepository.Add(user);
                 await _unitOfWork.Commit();
+                return user;
             }
-            catch(Exception)
+            catch (Exception)
             {
                 await _unitOfWork?.Rollback();
                 throw;
             }
-
-            return user;
         }
     }
 }

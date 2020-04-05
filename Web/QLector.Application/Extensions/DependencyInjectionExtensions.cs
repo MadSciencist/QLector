@@ -15,6 +15,7 @@ namespace QLector.Application.Extensions
                 .RegisterMediator()
                 .RegisterAutoMapper()
                 .RegisterBehavior(typeof(LoggingBehavior<,>))
+                //.RegisterBehavior(typeof(AuthorizationBehavior<,>))
                 .RegisterBehavior(typeof(ValidationBehavior<,>))
                 .AddValidatorsFromAssembly(typeof(ValidationBehavior<,>).Assembly);
         }

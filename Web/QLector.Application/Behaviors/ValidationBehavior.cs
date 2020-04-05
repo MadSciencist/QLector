@@ -17,17 +17,13 @@ namespace QLector.Application.Behaviors
             _validators = validators;
         }
 
-        public async Task<TResp> Handle(TRequest request,
-            CancellationToken cancellationToken,
-            RequestHandlerDelegate<TResp> next)
+        public async Task<TResp> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResp> next)
         {
             var (isValid, messages) = DoValidate(request);
 
             if (!isValid)
-            {
                 throw new ValidationException(messages);
-            }
-
+       
             return await next();
         }
 
