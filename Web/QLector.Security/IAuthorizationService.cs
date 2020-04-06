@@ -4,6 +4,6 @@ namespace QLector.Security
 {
     public interface IAuthorizationService
     {
-        bool Authorize(ClaimsPrincipal principal, string permission);
+        bool AuthorizeByRole(ClaimsPrincipal principal, string role);
     }
 }

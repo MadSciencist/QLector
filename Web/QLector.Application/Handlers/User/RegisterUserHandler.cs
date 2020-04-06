@@ -4,7 +4,6 @@ using QLector.Application.Commands;
 using QLector.Application.Commands.User;
 using QLector.Application.ResponseModels;
 using QLector.Application.ResponseModels.User;
-using QLector.Entities.Enumerations.Users;
 using QLector.Security;
 using QLector.Security.Dto;
 using QLector.Security.Exceptions;
@@ -13,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace QLector.Application.Handlers.User
 {
-    [RequirePermission(Roles.RegularUser)]
+    [RequirePermission("name")]
     public class RegisterUserHandler : BaseHandler<RegisterUserCommand, UserCreatedModel>
     {
         private readonly IUserService _userService;

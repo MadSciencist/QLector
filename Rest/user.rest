@@ -4,7 +4,7 @@ content-type: application/json
 accept: application/json
 
 {
-    "login": "matty5422444",
+    "login": "matty1",
     "password": "passw1"
 }
 
@@ -13,9 +13,25 @@ accept: application/json
 POST http://localhost:5005/api/user/register HTTP/1.1
 content-type: application/json
 accept: application/json
+Authorization: Bearer {{token}}
 
 {
-    "userName": "matty54224442",
+    "userName": "matty",
     "password": "passw1",
-    "email": "matty@matty42542424.com"
+    "email": "matty@matt5.com"
 }
+
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJhMDZkYmYzYi03ZjNkLTQ5ZjQtYWExMy1mMDBjZmVjNDQ4N2MiLCJzdWIiOiIyIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6Im1hdHR5MSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6Im1hdHR5QG1hdHQxLmNvbSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6InJlZ3VsYXIiLCJleHAiOjE1ODYxOTEwMjQsImlzcyI6IlFMZWN0b3IiLCJhdWQiOiIqIn0.BQaxIoK4Zhdr1m-wUD6xuhj0ePQzT0KjPwFPMijFs8M
+
+
+###
+DELETE  http://localhost:5005/api/user/2/roles/2 HTTP/1.1
+content-type: application/json
+accept: application/json
+Authorization: Bearer {{token}}
+
+###
+POST  http://localhost:5005/api/user/2/roles/2 HTTP/1.1
+content-type: application/json
+accept: application/json
+Authorization: Bearer {{token}}

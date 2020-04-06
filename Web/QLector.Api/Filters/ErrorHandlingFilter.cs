@@ -35,10 +35,8 @@ namespace QLector.Api.Filters
             }
             else if(context.Exception is UnauthorizedAccessException)
             {
-                context.Result = new ObjectResult(new object())
-                {
-                    StatusCode = StatusCodes.Status401Unauthorized
-                };
+                context.Result = new ObjectResult(Response<object>.FromError("No access to given ressource")
+                    .SetStatusCodeOverride(StatusCodes.Status401Unauthorized));
                 context.ExceptionHandled = true;
                 return;
             }

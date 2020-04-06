@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using QLector.Application.ResponseModels;
-using System;
 using System.Security.Claims;
 
 namespace QLector.Application.Commands
@@ -10,19 +9,13 @@ namespace QLector.Application.Commands
     /// </summary>
     /// <typeparam name="TRequest"></typeparam>
     /// <typeparam name="TResponse"></typeparam>
-    public class Request<TRequest, TResponse> : IRequest<Response<TResponse>>
+    public class Request<TRequest, TResponse> : RequestBase, IRequest<Response<TResponse>>
     {
         public TRequest Data { get; }
 
-        private readonly ClaimsPrincipal _principal;
-        public ClaimsPrincipal Principal { get => _principal ?? throw new NullReferenceException(nameof(_principal)); }
-
-        public Request(TRequest data, ClaimsPrincipal claimsPrincipal)
+        public Request(TRequest data, ClaimsPrincipal claimsPrincipal) : base(claimsPrincipal)
         {
             Data = data;
-            _principal = claimsPrincipal;
         }
-
-        public Request(TRequest data) : this(data, null) { }
     }
 }

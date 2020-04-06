@@ -36,13 +36,9 @@ namespace QLector.Application.Handlers.User
                     Id = tokenDto.UserId,
                 };
             }
-            catch (UnauthorizedAccessException ex)
+            catch (Exception ex) when (ex is UnauthorizedAccessException || ex is InvalidLoginAttemptException)
             {
                 result.AddError(ex.Message).SetStatusCodeOverride(StatusCodes.Status401Unauthorized);
-            }
-            catch (InvalidLoginAttemptException ex)
-            {
-                result.AddError(ex.Message).SetStatusCodeOverride(StatusCodes.Status400BadRequest);
             }
 
             return result;

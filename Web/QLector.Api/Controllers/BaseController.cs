@@ -8,6 +8,8 @@ namespace QLector.Api.Controllers
 {
     [Authorize]
     [ApiController]
+    [Consumes("application/json")]
+    [Produces("application/json")]
     [Route("api/[controller]")]
     public abstract class BaseController : ControllerBase
     {
@@ -25,7 +27,7 @@ namespace QLector.Api.Controllers
 
             return new ObjectResult(serviceResponse)
             {
-                StatusCode = serviceResponse.ResponseStatusCodeOverride ?? StatusCodes.Status200OK
+                StatusCode = serviceResponse.GetResponseStatusCodeOverride() ?? StatusCodes.Status200OK
             };
         }
     }

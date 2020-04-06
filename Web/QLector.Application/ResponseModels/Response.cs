@@ -14,24 +14,26 @@ namespace QLector.Application.ResponseModels
         public TResponse Data { get; set; }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public IList<Message> Messages { get; set; }
+        public List<Message> Messages { get; set; }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public object ProblemDetails { get; set; }
 
         [JsonIgnore]
-        public int? ResponseStatusCodeOverride { get; private set; }
+        private int? _responseStatusCodeOverride;
 
         public Response()
         {
             Messages = new List<Message>();
         }
 
+        public int? GetResponseStatusCodeOverride() => _responseStatusCodeOverride;
+
         public Response<TResponse> SetStatusCodeOverride(int statusCode)
         {
             if(statusCode >= 100 && statusCode <= 599)
             {
-                ResponseStatusCodeOverride = statusCode;
+                _responseStatusCodeOverride = statusCode;
                 return this;
             }
 

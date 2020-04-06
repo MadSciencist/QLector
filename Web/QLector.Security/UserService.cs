@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using QLector.Domain.Abstractions;
 using QLector.Domain.Abstractions.Repository.Users;
+using QLector.Entities;
 using QLector.Entities.Entity.Users;
 using QLector.Entities.Enumerations.Users;
 using QLector.Security.Dto;
@@ -104,6 +105,52 @@ namespace QLector.Security
                 await _userRepository.Add(user);
                 await _unitOfWork.Commit();
                 return user;
+            }
+            catch (Exception)
+            {
+                await _unitOfWork?.Rollback();
+                throw;
+            }
+        }
+
+        public async Task<BasicResponse> RemoveRole(AddRemoveRoleDto removeRoleDto)
+        {
+            try
+            {
+                var user = await _userRepository.FindById(removeRoleDto.UserId);
+
+                if (user is null)
+                    return new BasicResponse(false, "User doesnt exists");
+
+                var role = await _roleRepository.FindById(removeRoleDto.RoleId);
+                
+                var removed = user.RemoveRole(role);
+
+                await _unitOfWork.Commit();
+                return new BasicResponse(removed, removed ? "Succesfully removed" : "Cannot remove - check if role exists");
+            }
+            catch (Exception)
+            {
+                await _unitOfWork?.Rollback();
+                throw;
+            }
+        }
+
+        public async Task<BasicResponse> AddRole(AddRemoveRoleDto addRoleDto)
+        {
+            try
+            {
+                var user = await _userRepository.FindById(addRoleDto.UserId);
+
+                if (user is null)
+                    return new BasicResponse(false, "User doesnt exists");
+
+                var role = await _roleRepository.FindById(addRoleDto.RoleId);
+
+                user.AddToRole(role);
+
+                await _unitOfWork.Commit();
+                return new BasicResponse(true, "Succesfully added");
             }
             catch (Exception)
             {

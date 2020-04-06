@@ -7,9 +7,9 @@ namespace QLector.Security
     {
         public string PermissionName { get; }
 
-        public RequirePermissionAttribute(string permissionName)
+        public RequirePermissionAttribute(string role)
         {
-            PermissionName = permissionName;
+            PermissionName = role;
         }
     }
 }

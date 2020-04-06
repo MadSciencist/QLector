@@ -17,7 +17,6 @@ namespace QLector.DAL.EF
                 .AddTransient(typeof(IRepository<,>), typeof(EntityFrameworkRepository<,>))
                 .AddTransient<IUserRepository, UserRepository>()
                 .AddTransient<IRoleRepository, RoleRepository>()
-                .AddTransient<IUserRoleLinkRepository, UserRoleLinkRepository>()
                 .AddDbContext<AppDbContext>(options =>
                 {
                     options.UseSqlServer(config["ConnectionString"]);

@@ -1,6 +1,8 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
+using QLector.Application.Commands;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -8,8 +10,7 @@ using System.Threading.Tasks;
 
 namespace QLector.Application.Behaviors
 {
-    public class ValidationBehavior<TRequest, TResp> : IPipelineBehavior<TRequest, TResp>
-        where TRequest : IRequest<TResp>
+    public class ValidationBehavior<TRequest, TResp> : IPipelineBehavior<TRequest, TResp> where TRequest : IRequest<TResp>
     {
         private readonly IEnumerable<IValidator<TRequest>> _validators;
         public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators)

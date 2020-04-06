@@ -30,10 +30,10 @@ namespace QLector.Application.Behaviors
             {
                 _logger.LogInformation("Evaluating permission {permission}", permissionAttribute.PermissionName);
 
-                if (!(request is Request<TRequest, TResponse> command))
+                if(!(request is RequestBase requestBase))
                     throw new InvalidOperationException($"Command must be {nameof(Request<TRequest, TResponse>)} class!");
 
-                if (!_authorizationService.Authorize(command.Principal, permissionAttribute.PermissionName))
+                if (!_authorizationService.AuthorizeByRole(requestBase.Principal, permissionAttribute.PermissionName))
                 {
                     _logger.LogError("Authorization failed!");
                     throw new UnauthorizedAccessException("Current principal has no access to given ressource");
@@ -42,11 +42,10 @@ namespace QLector.Application.Behaviors
                 {
                     _logger.LogInformation("Authorization successful");
                 }
-
             }
             else
             {
-                _logger.LogWarning("Handler {handler} has no PermissionAttribute", handlerType);
+                _logger.LogWarning("Handler {handler} has no RequirePermission attribute", handlerType);
             }
 
             return await next();

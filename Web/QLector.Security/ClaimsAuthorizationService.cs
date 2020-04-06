@@ -1,26 +1,21 @@
 ﻿using QLector.Entities.Enumerations.Users;
 using System;
-using System.Linq;
 using System.Security.Claims;
 
 namespace QLector.Security
 {
     public class ClaimsAuthorizationService : IAuthorizationService
     {
-        public bool Authorize(ClaimsPrincipal principal, string permission)
+        public bool AuthorizeByRole(ClaimsPrincipal principal, string role)
         {
             if (principal is null)
                 return false;
 
-            if (string.IsNullOrWhiteSpace(permission))
-                throw new ArgumentNullException(nameof(permission));
+            if (string.IsNullOrWhiteSpace(role))
+                throw new ArgumentNullException(nameof(role));
 
-            // Allow admin role
-            if (principal.Claims.Any(x => x.Type == ClaimTypes.Role && x.Value == Roles.AdminUser))
-                return true;
-
-            // TODO custom claim type
-            return principal.Claims.Any(x => x.Type == ClaimTypes.Role && x.Value == permission);
+            // Allow admin
+            return principal.IsInRole(Roles.AdminUser) || principal.IsInRole(role);
         }
     }
 }

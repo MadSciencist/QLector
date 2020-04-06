@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace QLector.Entities.Entity.Users
 {
@@ -53,7 +54,23 @@ namespace QLector.Entities.Entity.Users
             if (_userRoleLinks is null)
                 _userRoleLinks = new List<UserRoleLink>();
 
+            if (_userRoleLinks.Any(x => x.RoleId == role.Id))
+                throw new DomainException($"User already has role {role.Name}");
+
             _userRoleLinks.Add(new UserRoleLink { Role = role });
+        }
+
+        public bool RemoveRole(Role role)
+        {
+            if (role is null)
+                throw new DomainException("Role doesnt exists!");
+
+            var toRemove = _userRoleLinks.FirstOrDefault(x => x.RoleId == role.Id);
+
+            if (toRemove is null)
+                throw new DomainException($"User doesn't have role {role.Name}");
+
+            return _userRoleLinks.Remove(toRemove);
         }
 
         public void SignIn()

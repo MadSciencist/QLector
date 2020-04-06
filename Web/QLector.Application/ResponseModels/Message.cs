@@ -13,5 +13,14 @@
                 Value = message
             };
         }
+
+        public static Message Info(string message)
+        {
+            return new Message
+            {
+                Type = MessageType.Information,
+                Value = message
+            };
+        }
     }
 }
