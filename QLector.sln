@@ -33,6 +33,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QLector.Domain", "src\QLect
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7D35FB82-901D-4C38-9A06-3EEA5451EC07}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QLector.Application.Tests", "tests\QLector.Application.Tests\QLector.Application.Tests.csproj", "{CD4D03DF-57FC-4440-A82D-78B772095B04}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,6 +107,14 @@ Global
 		{96307310-F07D-4B37-A1E9-20AF78DB12A4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{96307310-F07D-4B37-A1E9-20AF78DB12A4}.Release|x86.ActiveCfg = Release|Any CPU
 		{96307310-F07D-4B37-A1E9-20AF78DB12A4}.Release|x86.Build.0 = Release|Any CPU
+		{CD4D03DF-57FC-4440-A82D-78B772095B04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD4D03DF-57FC-4440-A82D-78B772095B04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD4D03DF-57FC-4440-A82D-78B772095B04}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CD4D03DF-57FC-4440-A82D-78B772095B04}.Debug|x86.Build.0 = Debug|Any CPU
+		{CD4D03DF-57FC-4440-A82D-78B772095B04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD4D03DF-57FC-4440-A82D-78B772095B04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD4D03DF-57FC-4440-A82D-78B772095B04}.Release|x86.ActiveCfg = Release|Any CPU
+		{CD4D03DF-57FC-4440-A82D-78B772095B04}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -113,6 +123,7 @@ Global
 		{6570C8CF-DFA6-44A0-AD0A-86DF67D50309} = {7DF200B1-FBCE-46C9-8E8B-C03159809F34}
 		{5E3B454A-A329-4E43-BD8B-D2E69AF217C9} = {7DF200B1-FBCE-46C9-8E8B-C03159809F34}
 		{BB91FCBB-B730-4B8E-8551-A09A0F081197} = {7D35FB82-901D-4C38-9A06-3EEA5451EC07}
+		{CD4D03DF-57FC-4440-A82D-78B772095B04} = {7D35FB82-901D-4C38-9A06-3EEA5451EC07}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AB2BAB9D-8172-4FA4-A40A-B10B5DA1F7B0}

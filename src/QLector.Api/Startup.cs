@@ -42,9 +42,8 @@ namespace QLector.Api
 
             ConfigureCustomErrorMessage(services)
                 .AddHttpContextAccessor()
-                .RegisterApplicationLayer(Configuration)
-                .AddJwtTokenBuilder()
-                .AddUserService()
+                .AddApplicationLayer(Configuration)
+                .AddSecurity()
                 .AddEntityFrameworkDataAccessImplementation(Configuration)
                 .AddSwaggerGen(o =>
                 {

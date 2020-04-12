@@ -9,10 +9,10 @@ namespace QLector.Domain.Users
         public string NormalizedName { get; private set; }
 
         private List<UserRoleLink> _userRoleLinks;
-        public IReadOnlyCollection<UserRoleLink> UserRoleLinks => _userRoleLinks;
+        public IReadOnlyCollection<UserRoleLink> UserRoleLinks => _userRoleLinks.AsReadOnly();
 
         private List<RolePermissionLink> _rolePermissionLinks;
-        public IReadOnlyCollection<RolePermissionLink> RolePermissionLinks => _rolePermissionLinks;
+        public IReadOnlyCollection<RolePermissionLink> RolePermissionLinks => _rolePermissionLinks.AsReadOnly();
 
         public Role() { }
 
@@ -25,7 +25,8 @@ namespace QLector.Domain.Users
             {
                 Name = name,
                 NormalizedName = name.ToUpperInvariant(),
-                _userRoleLinks = new List<UserRoleLink>()
+                _userRoleLinks = new List<UserRoleLink>(),
+                _rolePermissionLinks = new List<RolePermissionLink>()
             };
         }
 

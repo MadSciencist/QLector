@@ -1,4 +1,4 @@
-﻿namespace QLector.Domain.Enumerations.Users
+﻿namespace QLector.Domain.Users.Enumerations
 {
     public static class Roles
     {

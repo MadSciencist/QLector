@@ -27,7 +27,7 @@ namespace QLector.Security
             var token = new JwtSecurityToken(
                 _config["Jwt:Issuer"],
                 _config["Jwt:Audience"],
-                claims,
+                claims ?? new List<Claim>(),
                 expires: expires,
                 signingCredentials: signingCredentials);
 

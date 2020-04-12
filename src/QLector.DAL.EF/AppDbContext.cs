@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using QLector.Domain.Enumerations.Users;
 using QLector.Domain.Users;
 
 namespace QLector.DAL.EF

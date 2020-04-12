@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Claims;
-using QLector.Domain.Enumerations.Users;
+using QLector.Domain.Users.Enumerations;
 
 namespace QLector.Security
 {

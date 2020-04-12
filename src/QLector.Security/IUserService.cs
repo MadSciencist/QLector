@@ -1,7 +1,7 @@
 ﻿using QLector.Domain.Core;
-using QLector.Domain.Enumerations.Users;
 using QLector.Security.Dto;
 using System.Threading.Tasks;
+using QLector.Domain.Users.Enumerations;
 
 namespace QLector.Security
 {

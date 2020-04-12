@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using QLector.Domain.Core;
 using System;
 using System.Collections.Generic;
@@ -10,11 +11,17 @@ namespace QLector.DAL.EF.Repository
 {
     public class EntityFrameworkRepository<TEntity, TKey> : IRepository<TEntity, TKey> where TEntity : class, IEntity
     {
-        protected readonly AppDbContext Context;
+        private AppDbContext _dbContext;
+        protected AppDbContext Context => _dbContext ??= ServiceProvider.GetRequiredService<AppDbContext>();
 
-        public EntityFrameworkRepository(AppDbContext context)
+        private IUnitOfWork _unitOfWork;
+        public IUnitOfWork UnitOfWork => _unitOfWork ??= ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+        protected IServiceProvider ServiceProvider { get; }
+
+        public EntityFrameworkRepository(IServiceProvider serviceProvider)
         {
-            Context = context;
+            ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
         public virtual async Task<TEntity> FindById(TKey id)

@@ -7,6 +7,7 @@ namespace QLector.Domain.Core
 {
     public interface IRepository<TEntity, in TKey> where TEntity : IEntity
     {
+        IUnitOfWork UnitOfWork { get; }
         Task<TEntity> FindById(TKey id);
         Task<TEntity> Add(TEntity entity);
         Task<TEntity> Update(TEntity entity);

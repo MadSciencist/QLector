@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using QLector.Domain.Users;
 using QLector.Domain.Users.Repositories;
 using System.Collections.Generic;
@@ -9,12 +10,10 @@ namespace QLector.DAL.EF.Repository.Users
 {
     public class RoleRepository : EntityFrameworkRepository<Role, int>, IRoleRepository
     {
-        public RoleRepository(AppDbContext context) : base(context)
-        {
-        }
+        public RoleRepository(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
         public async Task<Role> FindByName(string name)
-            => await Context.Roles.FirstOrDefaultAsync(x => x.NormalizedName == name);
+            => await Context.Roles.FirstOrDefaultAsync(x => x.Name == name);
 
         public async Task<IEnumerable<string>> GetUserRoles(string username) 
             => await Context.UserRoleLinks

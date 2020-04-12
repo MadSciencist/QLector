@@ -10,7 +10,7 @@ namespace QLector.DAL.EF
 {
     public static class DependencyInjectionExtensions
     {
-        public static IServiceCollection AddEntityFrameworkDataAccessImplementation(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection AddEntityFrameworkDataAccessImplementation(this IServiceCollection services, IConfiguration config, bool useInMemoryDb = false)
         {
             return services
                 .AddScoped<IUnitOfWork, EntityFrameworkUnitOfWork>()
@@ -20,7 +20,14 @@ namespace QLector.DAL.EF
                 .AddTransient<IDbInitializer, EntityFrameworkDbInitializer>()
                 .AddDbContext<AppDbContext>(options =>
                 {
-                    options.UseSqlServer(config["ConnectionString"]);
+                    if (useInMemoryDb)
+                    {
+                        options.UseInMemoryDatabase("test");
+                    }
+                    else
+                    {
+                        options.UseSqlServer(config["ConnectionString"]);
+                    }
 
                 }, ServiceLifetime.Scoped);
         }

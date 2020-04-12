@@ -15,10 +15,13 @@ namespace QLector.Application.Core.Extensions
     {
         private static Assembly CurrentAssembly => typeof(ModuleLoader).Assembly;
 
-        public static IServiceCollection RegisterApplicationLayer(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection AddApplicationLayer(this IServiceCollection services, IConfiguration config, IHostAssemblyProvider hostAssemblyProvider = null)
         {
+            if (hostAssemblyProvider is null)
+                hostAssemblyProvider = new HostAssemblyProvider();
+
             return services
-                .AddModules(config)
+                .AddModules(config, hostAssemblyProvider)
                 .AddMediatR(CurrentAssembly)
                 .AddAutoMapper(CurrentAssembly)
                 .RegisterBehavior(typeof(LoggingBehavior<,>))
@@ -27,9 +30,9 @@ namespace QLector.Application.Core.Extensions
                 .AddValidatorsFromAssembly(CurrentAssembly);
         }
 
-        private static IServiceCollection AddModules(this IServiceCollection services, IConfiguration config)
+        private static IServiceCollection AddModules(this IServiceCollection services, IConfiguration config, IHostAssemblyProvider hostAssemblyProvider)
         {
-            var modules = new ModuleLoader().GetModules();
+            var modules = new ModuleLoader(hostAssemblyProvider).GetModules();
 
             modules.ToList().ForEach(module =>
             {

@@ -7,7 +7,7 @@ namespace QLector.Domain.Users.Repositories
     public interface IRoleRepository : IRepository<Role, int>
     {
         /// <summary>
-        /// Find by normalized role name
+        /// Find by role name
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>

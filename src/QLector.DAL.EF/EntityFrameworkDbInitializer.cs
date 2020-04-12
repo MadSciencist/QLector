@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using QLector.Domain.Enumerations.Users;
 using QLector.Domain.Users;
 using QLector.Domain.Users.Repositories;
 using System;
 using System.Threading.Tasks;
+using QLector.Domain.Users.Enumerations;
 
 namespace QLector.DAL.EF
 {
