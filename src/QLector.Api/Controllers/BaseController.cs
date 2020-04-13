@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using QLector.Api.BindModels;
 using QLector.Application.Core;
 
 namespace QLector.Api.Controllers
@@ -12,10 +13,18 @@ namespace QLector.Api.Controllers
     [Route("api/[controller]")]
     public abstract class BaseController : ControllerBase
     {
-        protected virtual Request<TRequest, TResponse> CreateCommand<TRequest, TResponse>(TRequest request)
+        protected virtual PagedQueryRequest<TRequest, TResponse> CreateQuery<TRequest, TResponse>(TRequest request, PagerBindModel pagerBindModel)
         {
             var user = HttpContext.User;
-            return new Request<TRequest, TResponse>(request, user);
+            var pagedQueryRequest = new PagedQueryRequest<TRequest, TResponse>(request, user);
+            pagedQueryRequest.CreatePager(pagerBindModel.Page, pagerBindModel.PageSize);
+            return pagedQueryRequest;
+        }
+
+        protected virtual CommandRequest<TRequest, TResponse> CreateCommand<TRequest, TResponse>(TRequest request)
+        {
+            var user = HttpContext.User;
+            return new CommandRequest<TRequest, TResponse>(request, user);
         }
 
         protected virtual IActionResult CreateActionResult<TResponse>(Response<TResponse> serviceResponse)

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace QLector.Application.Users.AddRole
 {
-    public class AddRoleHandler : BaseHandler<AddRoleCommand, IsSuccessResponse>
+    public class AddRoleHandler : BaseCommandHandler<AddRoleCommand, IsSuccessResponse>
     {
         private readonly IUserService _userService;
 
@@ -17,7 +17,7 @@ namespace QLector.Application.Users.AddRole
             _userService = userService;
         }
 
-        protected override async Task<Response<IsSuccessResponse>> Handle(Request<AddRoleCommand, IsSuccessResponse> request)
+        protected override async Task<Response<IsSuccessResponse>> Handle(CommandRequest<AddRoleCommand, IsSuccessResponse> request)
         {
             var result = new Response<IsSuccessResponse>();
 

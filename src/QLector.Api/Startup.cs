@@ -43,7 +43,7 @@ namespace QLector.Api
             ConfigureCustomErrorMessage(services)
                 .AddHttpContextAccessor()
                 .AddApplicationLayer(Configuration)
-                .AddSecurity()
+                .AddSecurity(Configuration)
                 .AddEntityFrameworkDataAccessImplementation(Configuration)
                 .AddSwaggerGen(o =>
                 {
@@ -53,6 +53,8 @@ namespace QLector.Api
                     o.IncludeXmlComments(xmlPath);
                     o.AddFluentValidationRules();
                 })
+                .AddOptions()
+                .AddTransient<IStartupFilter, StartupConfigValidationFilter>()
                 .AddAuthentication(options =>
                 {
                     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

@@ -31,7 +31,7 @@ namespace QLector.Application.Tests.Application.User.Login
                 Login = username,
                 Password = password
             };
-            var request = new Request<LoginCommand, UserLoggedDto>(cmd, null);
+            var request = new CommandRequest<LoginCommand, UserLoggedDto>(cmd, null);
 
             // Act
             var response = await _mediator.Send(request);
@@ -54,7 +54,7 @@ namespace QLector.Application.Tests.Application.User.Login
                 Login = username,
                 Password = "invalid"
             };
-            var request = new Request<LoginCommand, UserLoggedDto>(cmd, null);
+            var request = new CommandRequest<LoginCommand, UserLoggedDto>(cmd, null);
 
             // Act
             var response = await _mediator.Send(request);
@@ -78,7 +78,7 @@ namespace QLector.Application.Tests.Application.User.Login
                 Login = "invalid",
                 Password = password
             };
-            var request = new Request<LoginCommand, UserLoggedDto>(cmd, null);
+            var request = new CommandRequest<LoginCommand, UserLoggedDto>(cmd, null);
 
             // Act
             var response = await _mediator.Send(request);

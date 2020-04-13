@@ -22,10 +22,14 @@ namespace QLector.Application.Core.Behaviors
 
             var commandType = appRequest.Data.GetType();
             var validator = _validatorFactory.GetValidator(commandType);
-            var result = validator.Validate(new ValidationContext(appRequest.Data));
 
-            if(!result.IsValid)
-                throw new ValidationException(result.Errors);
+            if (validator != null)
+            {
+                var result = validator.Validate(new ValidationContext(appRequest.Data));
+
+                if (!result.IsValid)
+                    throw new ValidationException(result.Errors);
+            }
 
             return await next();
         }

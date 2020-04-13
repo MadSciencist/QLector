@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace QLector.Application.Users.Login
 {
-    public class LoginHandler : BaseHandler<LoginCommand, UserLoggedDto>
+    public class LoginHandler : BaseCommandHandler<LoginCommand, UserLoggedDto>
     {
         private readonly IUserService _userService;
 
@@ -16,8 +16,8 @@ namespace QLector.Application.Users.Login
         {
             _userService = userService;
         }
-
-        protected override async Task<Response<UserLoggedDto>> Handle(Request<LoginCommand, UserLoggedDto> request)
+        
+        protected override async Task<Response<UserLoggedDto>> Handle(CommandRequest<LoginCommand, UserLoggedDto> request)
         {
             var result = new Response<UserLoggedDto>();
 

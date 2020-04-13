@@ -2,30 +2,30 @@
 using Microsoft.Extensions.Logging;
 using QLector.Domain.Core;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace QLector.DAL.EF
 {
     public class EntityFrameworkUnitOfWork : IUnitOfWork
     {
-        private Guid _transactionId;
-        public Guid TransactionId { get => _transactionId; }
+        public Guid TransactionId { get; }
 
         private readonly ILogger<EntityFrameworkUnitOfWork> _logger;
-        private readonly AppDbContext _dbContex;
+        private readonly AppDbContext _dbContext;
 
         public EntityFrameworkUnitOfWork(AppDbContext context, ILogger<EntityFrameworkUnitOfWork> logger)
         {
-            _dbContex = context ?? throw new ArgumentNullException(nameof(context));
+            _dbContext = context ?? throw new ArgumentNullException(nameof(context));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _transactionId = Guid.NewGuid();
+            TransactionId = Guid.NewGuid();
         }
 
-        public async Task Commit()
+        public async Task Commit(CancellationToken cancellationToken = default(CancellationToken) )
         {
             try
             {
-                await _dbContex.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync(cancellationToken);
             }
             catch (DbUpdateException ex)
             {
@@ -34,7 +34,7 @@ namespace QLector.DAL.EF
             }
         }
 
-        public async Task Rollback()
+        public async Task Rollback(CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -48,8 +48,7 @@ namespace QLector.DAL.EF
 
         private Task DoRollback()
         {
-            // TODO check this
-            foreach (var entry in _dbContex.ChangeTracker.Entries())
+            foreach (var entry in _dbContext.ChangeTracker.Entries())
             {
                 switch (entry.State)
                 {
@@ -70,7 +69,7 @@ namespace QLector.DAL.EF
                 }
             }
 
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
     }
 }

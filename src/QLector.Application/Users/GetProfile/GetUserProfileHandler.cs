@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace QLector.Application.Users.GetProfile
 {
-    public class GetUserProfileHandler : BaseHandler<GetUserProfileCommand, UserProfileDto>
+    public class GetUserProfileHandler : BaseCommandHandler<GetUserProfileCommand, UserProfileDto>
     {
         private readonly IUserService _userService;
 
@@ -15,7 +15,7 @@ namespace QLector.Application.Users.GetProfile
             _userService = userService;
         }
 
-        protected override async Task<Response<UserProfileDto>> Handle(Request<GetUserProfileCommand, UserProfileDto> request)
+        protected override async Task<Response<UserProfileDto>> Handle(CommandRequest<GetUserProfileCommand, UserProfileDto> request)
         {
             var getProfileParam = Mapper.Map<GetProfileDto>(request.Data);
             var user = await _userService.GetProfile(getProfileParam);

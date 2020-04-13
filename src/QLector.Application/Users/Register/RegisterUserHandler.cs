@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace QLector.Application.Users.Register
 {
-    public class RegisterUserHandler : BaseHandler<RegisterUserCommand, UserCreatedDto>
+    public class RegisterUserHandler : BaseCommandHandler<RegisterUserCommand, UserCreatedDto>
     {
         private readonly IUserService _userService;
 
@@ -18,7 +18,7 @@ namespace QLector.Application.Users.Register
             _userService = userService;
         }
 
-        protected override async Task<Response<UserCreatedDto>> Handle(Request<RegisterUserCommand, UserCreatedDto> request)
+        protected override async Task<Response<UserCreatedDto>> Handle(CommandRequest<RegisterUserCommand, UserCreatedDto> request)
         {
             var result = new Response<UserCreatedDto>();
 

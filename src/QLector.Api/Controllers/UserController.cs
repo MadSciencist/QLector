@@ -1,12 +1,15 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using QLector.Api.BindModels;
 using QLector.Application.Core;
 using QLector.Application.Users.AddRole;
 using QLector.Application.Users.GetProfile;
+using QLector.Application.Users.GetProfiles;
 using QLector.Application.Users.Login;
 using QLector.Application.Users.Register;
 using QLector.Application.Users.RemoveRole;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace QLector.Api.Controllers
@@ -32,9 +35,19 @@ namespace QLector.Api.Controllers
         [ProducesResponseType(typeof(Response<UserProfileDto>), 200)]
         public async Task<IActionResult> GetProfile(int userId)
         {
-            var commandParam = new GetUserProfileCommand {UserId = userId};
+            var commandParam = new GetUserProfileCommand { UserId = userId };
             var command = CreateCommand<GetUserProfileCommand, UserProfileDto>(commandParam);
             var result = await _mediator.Send(command);
+            return CreateActionResult(result);
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [ProducesResponseType(typeof(Response<List<UserProfileDto>>), 200)]
+        public async Task<IActionResult> GetProfiles([FromQuery]PagerBindModel pagerBindModel)
+        {
+            var query = CreateQuery<GetProfilesQuery, UserProfileDto> (new GetProfilesQuery(), pagerBindModel);
+            var result = await _mediator.Send(query);
             return CreateActionResult(result);
         }
 

@@ -32,7 +32,7 @@ namespace QLector.Application.Tests.Application.User.Register
                 Password = "s3cure",
                 UserName = "User_Register_CanRegister"
             };
-            var request = new Request<RegisterUserCommand, UserCreatedDto>(cmd, null);
+            var request = new CommandRequest<RegisterUserCommand, UserCreatedDto>(cmd, null);
 
             // Act
             var response = await _mediator.Send(request);

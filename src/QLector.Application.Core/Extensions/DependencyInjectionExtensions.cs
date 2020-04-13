@@ -27,7 +27,8 @@ namespace QLector.Application.Core.Extensions
                 .RegisterBehavior(typeof(LoggingBehavior<,>))
                 .RegisterBehavior(typeof(AuthorizationBehavior<,>))
                 .RegisterBehavior(typeof(ValidationBehavior<,>))
-                .AddValidatorsFromAssembly(CurrentAssembly);
+                .AddValidatorsFromAssembly(CurrentAssembly)
+                .AddTransient<IDbConnectionFactory, SqlServerConnectionFactory>();
         }
 
         private static IServiceCollection AddModules(this IServiceCollection services, IConfiguration config, IHostAssemblyProvider hostAssemblyProvider)

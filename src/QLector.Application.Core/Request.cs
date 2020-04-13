@@ -1,5 +1,5 @@
-﻿using System.Security.Claims;
-using MediatR;
+﻿using MediatR;
+using System.Security.Claims;
 
 namespace QLector.Application.Core
 {
@@ -7,16 +7,16 @@ namespace QLector.Application.Core
     /// Application layer request container
     /// </summary>
     /// <typeparam name="TRequest"></typeparam>
-    /// <typeparam name="TResponse"></typeparam>
-    public class Request<TRequest, TResponse> : IRequest<Response<TResponse>>, IApplicationRequest<TRequest>
+    /// <typeparam name="TResponseDto"></typeparam>
+    public class CommandRequest<TRequest, TResponseDto> : IRequest<Response<TResponseDto>>, IApplicationRequest<TRequest>
     {
         public TRequest Data { get; }
         public ClaimsPrincipal Principal { get; }
 
-        public Request(TRequest data, ClaimsPrincipal claimsPrincipal)
+        public CommandRequest(TRequest data, ClaimsPrincipal claimsPrincipal)
         {
             Data = data;
             Principal = claimsPrincipal;
         }
     }
-}
+}   

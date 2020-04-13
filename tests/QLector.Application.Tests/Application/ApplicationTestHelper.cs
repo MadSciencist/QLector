@@ -36,9 +36,8 @@ namespace QLector.Application.Tests.Application
                 implementationType = typeof(ServiceProviderValidatorFactory);
             var serviceDescriptor = ServiceDescriptor.Transient(service, implementationType);
 
-
             serviceCollection.AddApplicationLayer(Config, new FakeHostAssemblyProvider());
-            serviceCollection.AddSecurity();
+            serviceCollection.AddSecurity(Config);
             serviceCollection.AddSingleton<IConfiguration>(Config);
             serviceCollection.AddEntityFrameworkDataAccessImplementation(Config, useInMemoryDb: true);
             serviceCollection.Add(serviceDescriptor);
@@ -70,8 +69,8 @@ namespace QLector.Application.Tests.Application
         {
             return new Dictionary<string, string>
             {
-                { "Jwt:key", "key23123asddasdasdasdasd" },
-                { "Jwt:ValidTimeMin", "55" },
+                { "Jwt:Key", "key23123asddasdasdasdasd" },
+                { "Jwt:TokenLifetimeMinutes", "55" },
                 { "Jwt:Issuer", "QLector" },
                 { "Jwt:Audience", "*" }
             };

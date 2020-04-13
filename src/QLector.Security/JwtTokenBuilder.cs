@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using QLector.Domain.Users;
 using System;
@@ -11,22 +11,30 @@ namespace QLector.Security
 {
     public class JwtTokenBuilder : ITokenBuilder
     {
-        private readonly IConfiguration _config;
-        public JwtTokenBuilder(IConfiguration config)
+        private readonly TokenOptionsSection _options;
+
+        public JwtTokenBuilder(IOptions<TokenOptionsSection> options)
         {
-            _config = config;
+            _options = options.Value ?? throw new ArgumentNullException(nameof(options));
         }
         
-        // TODO strongly typed config
         public (string token, DateTime expires) Build(User user, IEnumerable<Claim> claims)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var rawKey = _options.Key ?? throw new ArgumentNullException("Key not found in config!");
+            var issuer = _options.Issuer ?? throw new ArgumentNullException("Issuer not found in config!");
+            var audience = _options.Audience ?? throw new ArgumentNullException("Audience not found in config!");
+            var tokenValidTime = _options.TokenLifetimeMinutes;
+
+            if (tokenValidTime == 0)
+                throw new ArgumentNullException("Token valid time cannot be 0! (is it in config?)");
+            
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(rawKey));
             var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expires = DateTime.Now.AddMinutes(double.Parse(_config["Jwt:ValidTimeMin"]));
+            var expires = DateTime.Now.AddMinutes(tokenValidTime);
 
             var token = new JwtSecurityToken(
-                _config["Jwt:Issuer"],
-                _config["Jwt:Audience"],
+                issuer,
+                audience,
                 claims ?? new List<Claim>(),
                 expires: expires,
                 signingCredentials: signingCredentials);

@@ -6,6 +6,8 @@ using QLector.Application.Core;
 using QLector.Application.Core.Extensions;
 using System;
 using System.Linq;
+using System.Security.Claims;
+using QLector.Domain.Users.Enumerations;
 
 namespace QLector.Api.Filters
 {
@@ -34,7 +36,7 @@ namespace QLector.Api.Filters
                 return;
             }
 
-            if(context.Exception is UnauthorizedAccessException unauthorizedEx)
+            if (context.Exception is UnauthorizedAccessException unauthorizedEx)
             {
                 var result = new ObjectResult(Response<object>.FromError(unauthorizedEx.Message))
                 {
@@ -45,19 +47,32 @@ namespace QLector.Api.Filters
                 return;
             }
 
-            // TODO refactor, enrich problem details, hide details for not auth/admins
-            var response = Response<object>.FromError(context?.Exception?.Message, new ProblemDetails
-            {
-                Type = context.HttpContext.Request.Path,
-                Status = StatusCodes.Status500InternalServerError,
-                Title = context?.Exception?.Message,
-                Detail = context?.Exception?.ToString(),
-            });
+            var details = CreateProblemDetails(context);
+            var response = Response<object>.FromError(details.Title, details);
 
             context.Result = new ObjectResult(response)
             {
                 StatusCode = StatusCodes.Status500InternalServerError
             };
+        }
+
+        private static ProblemDetails CreateProblemDetails(ActionExecutedContext context)
+        {
+            const string unauthorizedMessage = "System error - contact admin";
+            var isAuth = AuthorizeDetails(context.HttpContext.User);
+
+            return new ProblemDetails
+            {
+                Type = context.HttpContext.Request.Path,
+                Status = StatusCodes.Status500InternalServerError,
+                Title = isAuth ? context?.Exception?.Message : unauthorizedMessage,
+                Detail = isAuth ? context?.Exception?.ToString() : string.Empty,
+            };
+        }
+
+        private static bool AuthorizeDetails(ClaimsPrincipal principal)
+        {
+            return principal != null && principal.IsInRole(Roles.AdminUser);
         }
     }
 }

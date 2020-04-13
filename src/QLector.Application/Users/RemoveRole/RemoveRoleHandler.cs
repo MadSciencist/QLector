@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace QLector.Application.Users.RemoveRole
 {
-    public class RemoveRoleHandler : BaseHandler<RemoveRoleCommand, IsSuccessResponse>
+    public class RemoveRoleHandler : BaseCommandHandler<RemoveRoleCommand, IsSuccessResponse>
     {
         private readonly IUserService _userService;
 
@@ -17,7 +17,7 @@ namespace QLector.Application.Users.RemoveRole
             _userService = userService;
         }
 
-        protected override async Task<Response<IsSuccessResponse>> Handle(Request<RemoveRoleCommand, IsSuccessResponse> request)
+        protected override async Task<Response<IsSuccessResponse>> Handle(CommandRequest<RemoveRoleCommand, IsSuccessResponse> request)
         {
             var result = new Response<IsSuccessResponse>();
 
