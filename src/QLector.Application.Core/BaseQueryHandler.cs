@@ -9,8 +9,7 @@ using System.Threading.Tasks;
 
 namespace QLector.Application.Core
 {
-    public abstract class
-        BaseQueryHandler<TRequest, TResponse> : IRequestHandler<PagedQueryRequest<TRequest, TResponse>,
+    public abstract class BaseQueryHandler<TRequest, TResponse> : IRequestHandler<PagedQueryRequest<TRequest, TResponse>,
             PagedResponse<TResponse>> where TRequest : IQuery
     {
         protected IServiceProvider Services { get; }

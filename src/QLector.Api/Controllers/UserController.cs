@@ -17,11 +17,11 @@ namespace QLector.Api.Controllers
     /// <summary>
     /// Manages users and roles
     /// </summary>
-    public class UserController : BaseController
+    public class UsersController : BaseController
     {
         private readonly IMediator _mediator;
 
-        public UserController(IMediator mediator)
+        public UsersController(IMediator mediator)
         {
             _mediator = mediator;
         }
@@ -41,9 +41,13 @@ namespace QLector.Api.Controllers
             return CreateActionResult(result);
         }
 
-        [AllowAnonymous]
+        /// <summary>
+        /// Lists all users
+        /// </summary>
+        /// <param name="pagerBindModel"></param>
+        /// <returns></returns>
         [HttpGet]
-        [ProducesResponseType(typeof(Response<List<UserProfileDto>>), 200)]
+        [ProducesResponseType(typeof(PagedResponse<List<UserProfileDto>>), 200)]
         public async Task<IActionResult> GetProfiles([FromQuery]PagerBindModel pagerBindModel)
         {
             var query = CreateQuery<GetProfilesQuery, UserProfileDto> (new GetProfilesQuery(), pagerBindModel);

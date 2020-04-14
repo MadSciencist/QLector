@@ -1,42 +1,48 @@
 ###
-POST http://localhost:5005/api/user/login HTTP/1.1
+POST http://localhost:5005/api/users/login HTTP/1.1
 content-type: application/json
 accept: application/json
 
 {
-    "login": "matty",
-    "password": "matty"
+    "login": "matty4",
+    "password": "matty111"
 }
 
 ###
+GET http://localhost:5005/api/users?page=1&pageSize=3 HTTP/1.1
+content-type: application/json
+accept: application/json
+Authorization: Bearer {{token}}
 
-POST http://localhost:5005/api/user/register HTTP/1.1
+###
+
+POST http://localhost:5005/api/users/register HTTP/1.1
 content-type: application/json
 accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "userName": "matty1",
-    "password": "matty",
-    "email": "matty@matt5.com"
+    "userName": "matty4",
+    "password": "matty111",
+    "email": "matty@matt154.com"
 }
 
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5MWVhNGFmNy1iNjQ4LTRkZTMtYTU4ZS0yZThmYWVmNDQ3YzIiLCJzdWIiOiIxIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6Im1hdHR5IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvZW1haWxhZGRyZXNzIjoibWF0dHlAbWF0dHkuY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoicmVndWxhciIsImV4cCI6MTU4NjYzMTI2NiwiaXNzIjoiUUxlY3RvciIsImF1ZCI6IioifQ.3W0ufLbaptemXkhYVdcqB6TIhQJUT192WsdRJ3wXySs
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJjOWViMjk5YS00YWUxLTQ4NTctODQ1MC1jMjBlM2E5ZTA1MTUiLCJzdWIiOiI2IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6Im1hdHR5NCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6Im1hdHR5QG1hdHQxNTQuY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoicmVndWxhciIsImV4cCI6MTU4NjgyOTQxNiwiaXNzIjoiUUxlY3RvciIsImF1ZCI6IioifQ.fm96stpyhG6ErWA6Yp_lNXd0Iiu4rzrKxlzV9apN-94
 
 
 ###
-DELETE  http://localhost:5005/api/user/1/roles/1 HTTP/1.1
+DELETE  http://localhost:5005/api/users/1/roles/1 HTTP/1.1
 content-type: application/json
 accept: application/json
 Authorization: Bearer {{token}}
 
 ###
-POST  http://localhost:5005/api/user/1/roles/1 HTTP/1.1
+POST  http://localhost:5005/api/users/1/roles/1 HTTP/1.1
 content-type: application/json
 accept: application/json
 Authorization: Bearer {{token}}
 
 ###
-GET http://localhost:5005/api/user/1
+GET http://localhost:5005/api/users/6
 accept: application/json
 Authorization: Bearer {{token}}

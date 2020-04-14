@@ -339,3 +339,4 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 /scripts/coverage
+/src/QLector.Api/.config/dotnet-tools.json
