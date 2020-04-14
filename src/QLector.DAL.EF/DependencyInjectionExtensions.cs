@@ -12,6 +12,8 @@ namespace QLector.DAL.EF
     {
         public static IServiceCollection AddEntityFrameworkDataAccessImplementation(this IServiceCollection services, IConfiguration config, bool useInMemoryDb = false)
         {
+            var inMemDb = config.GetValue<bool>("InMemoryDatabase");
+
             return services
                 .AddScoped<IUnitOfWork, EntityFrameworkUnitOfWork>()
                 .AddTransient(typeof(IRepository<,>), typeof(EntityFrameworkRepository<,>))
@@ -20,7 +22,8 @@ namespace QLector.DAL.EF
                 .AddTransient<IDbInitializer, EntityFrameworkDbInitializer>()
                 .AddDbContext<AppDbContext>(options =>
                 {
-                    if (useInMemoryDb)
+                    // refactor
+                    if (inMemDb || useInMemoryDb)
                     {
                         options.UseInMemoryDatabase("test");
                     }
