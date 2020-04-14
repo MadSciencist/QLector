@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{7DF200B1-FBCE-46C9-8E8B-C03159809F34}"
+	ProjectSection(SolutionItems) = preProject
+		readme.md = readme.md
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Rest", "Rest", "{6570C8CF-DFA6-44A0-AD0A-86DF67D50309}"
 	ProjectSection(SolutionItems) = preProject
@@ -33,7 +36,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QLector.Domain", "src\QLect
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7D35FB82-901D-4C38-9A06-3EEA5451EC07}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QLector.Application.Tests", "tests\QLector.Application.Tests\QLector.Application.Tests.csproj", "{CD4D03DF-57FC-4440-A82D-78B772095B04}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QLector.Application.Tests", "tests\QLector.Application.Tests\QLector.Application.Tests.csproj", "{CD4D03DF-57FC-4440-A82D-78B772095B04}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
