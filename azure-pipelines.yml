@@ -22,22 +22,23 @@ steps:
       inputs:
         command: test
         projects: 'tests/**/*.csproj'
-        arguments: '--configuration $(BuildConfiguration) --no-build /p:CollectCoverage=true /p:IncludeTestAssembly=true /p:CoverletOutputFormat=opencover%2ccobertura /p:CoverletOutput=../target/reports/coverage/'
+        arguments: '--configuration $(BuildConfiguration) --no-build /p:CollectCoverage=true /p:IncludeTestAssembly=true /p:CoverletOutputFormat=opencover%2ccobertura /p:CoverletOutput=../../target/reports/coverage/'
     
     - task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
-        displayName: ReportGenerator
-        inputs:
-        reports: 'src\target\reports\coverage\coverage.opencover.xml'
-        targetdir: 'src\target\reports\coverage'
+      displayName: ReportGenerator
+      inputs:
+        reports: 'target\reports\coverage\coverage.opencover.xml'
+        targetdir: 'target\reports\coverage'
         reporttypes: 'HtmlInline_AzurePipelines;Cobertura;Badges'
         assemblyfilters: '-xunit*'
+        verbosity: 'Verbose'
 
     - task: PublishCodeCoverageResults@1
-        displayName: 'Publish code coverage results'
-        inputs:
+      displayName: 'Publish code coverage results'
+      inputs:
         codeCoverageTool: Cobertura
-        summaryFileLocation: '$(build.sourcesdirectory)\src\target\reports\coverage\coverage.cobertura.xml'
-        reportDirectory: '$(build.sourcesdirectory)\src\target\reports\coverage'
+        summaryFileLocation: '$(build.sourcesdirectory)\target\reports\coverage\coverage.cobertura.xml'
+        reportDirectory: '$(build.sourcesdirectory)\target\reports\coverage'
 
     - task: DotNetCoreCLI@2
       displayName: "Publish"
