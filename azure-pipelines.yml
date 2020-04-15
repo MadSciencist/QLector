@@ -22,7 +22,22 @@ steps:
       inputs:
         command: test
         projects: 'tests/**/*.csproj'
-        arguments: '--configuration $(buildConfiguration) --logger "trx;LogFileName=testresults.trx" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=tests/Coverage/'
+        arguments: '--configuration $(BuildConfiguration) --no-build /p:CollectCoverage=true /p:IncludeTestAssembly=true /p:CoverletOutputFormat=opencover%2ccobertura /p:CoverletOutput=../target/reports/coverage/'
+    
+    - task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
+        displayName: ReportGenerator
+        inputs:
+        reports: 'src\target\reports\coverage\coverage.opencover.xml'
+        targetdir: 'src\target\reports\coverage'
+        reporttypes: 'HtmlInline_AzurePipelines;Cobertura;Badges'
+        assemblyfilters: '-xunit*'
+
+    - task: PublishCodeCoverageResults@1
+        displayName: 'Publish code coverage results'
+        inputs:
+        codeCoverageTool: Cobertura
+        summaryFileLocation: '$(build.sourcesdirectory)\src\target\reports\coverage\coverage.cobertura.xml'
+        reportDirectory: '$(build.sourcesdirectory)\src\target\reports\coverage'
 
     - task: DotNetCoreCLI@2
       displayName: "Publish"
@@ -32,19 +47,8 @@ steps:
         arguments: '-r linux-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
         zipAfterPublish: true
 
-    - script: dotnet reportgenerator "-reports:$(Build.SourcesDirectory)/tests/report/coverage.cobertura.xml" "-targetDir:$(Build.SourcesDirectory)/tests/report" -tag:$(Build.BuildNumber) -reportTypes:htmlInline
-      workingDirectory: $(Build.SourcesDirectory)/tests
-      displayName: 'dotnet reportgenerator'
-
     - task: PublishBuildArtifacts@1
       displayName: "Upload Artifacts"
       inputs:
         pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
         artifactName: 'app-linux-x64' 
-
-    - task: PublishCodeCoverageResults@1
-      inputs:
-        codeCoverageTool: 'cobertura'
-        summaryFileLocation: $(Build.SourcesDirectory)/tests/**/coverage.cobertura.xml
-        reportDirectory: $(Build.SourcesDirectory)/tests/Coverage/report
-        failIfCoverageEmpty: false
