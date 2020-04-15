@@ -31,6 +31,7 @@ steps:
         targetdir: 'target\reports\coverage'
         reporttypes: 'HtmlInline_AzurePipelines;Cobertura;Badges'
         assemblyfilters: '-xunit*'
+        verbosity: 'Verbose'
 
     - task: PublishCodeCoverageResults@1
       displayName: 'Publish code coverage results'
