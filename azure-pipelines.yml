@@ -27,8 +27,8 @@ steps:
     - task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
       displayName: ReportGenerator
       inputs:
-        reports: 'target\reports\coverage\coverage.opencover.xml'
-        targetdir: 'target\reports\coverage'
+        reports: 'target/reports/coverage/coverage.opencover.xml'
+        targetdir: 'target/reports/coverage'
         reporttypes: 'HtmlInline_AzurePipelines;Cobertura;Badges'
         assemblyfilters: '-xunit*'
         verbosity: 'Verbose'
@@ -37,8 +37,8 @@ steps:
       displayName: 'Publish code coverage results'
       inputs:
         codeCoverageTool: Cobertura
-        summaryFileLocation: '$(build.sourcesdirectory)\target\reports\coverage\coverage.cobertura.xml'
-        reportDirectory: '$(build.sourcesdirectory)\target\reports\coverage'
+        summaryFileLocation: '$(build.sourcesdirectory)/target/reports/coverage/coverage.cobertura.xml'
+        reportDirectory: '$(build.sourcesdirectory)/target/reports/coverage'
 
     - task: DotNetCoreCLI@2
       displayName: "Publish"
