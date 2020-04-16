@@ -23,6 +23,7 @@ steps:
       inputs:
         version: '3.1.x'
         packageType: sdk
+
     - script: dotnet build --configuration $(buildConfiguration)
       displayName: 'dotnet build $(buildConfiguration)'
 
@@ -33,12 +34,23 @@ steps:
         projects: 'tests/**/*.csproj'
         arguments: '--configuration $(BuildConfiguration) --no-build /p:CollectCoverage=true /p:IncludeTestAssembly=true /p:CoverletOutputFormat=opencover%2ccobertura /p:CoverletOutput=../../target/reports/coverage/'
     
+    - task: UseDotNet@2 
+      displayName: ".NET Core 2.1 (for Sonar-Cloud)"
+      inputs:
+        version: '3.1.x'
+        packageType: runtime
     - task: SonarCloudAnalyze@1
 
     - task: SonarCloudPublish@1
       inputs:
         pollingTimeoutSec: '300'
 
+    - task: UseDotNet@2 
+      displayName: ".NET Core 3.1.x"
+      inputs:
+        version: '3.1.x'
+        packageType: sdk
+        
     - task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
       displayName: ReportGenerator
       inputs:
