@@ -11,48 +11,52 @@ variables:
 steps:
 
     - task: SonarCloudPrepare@1
+      displayName: 'Prepare Sonar-Cloud analysis'
       inputs:
         SonarCloud: 'qlector-azurepipelines'
         organization: 'madsciencist-github'
         scannerMode: 'MSBuild'
         projectKey: 'MadSciencist_QLector'
         projectName: 'qlector'
+        extraProperties: 'sonar.cs.opencover.reportsPaths=$(build.sourcesdirectory)/target/reports/coverage/coverage.opencover.xml'
 
     - task: UseDotNet@2 
-      displayName: ".NET Core 3.1.x"
+      displayName: "Use .NET Core 3.1 (SDK)"
       inputs:
         version: '3.1.x'
         packageType: sdk
 
     - script: dotnet build --configuration $(buildConfiguration)
-      displayName: 'dotnet build $(buildConfiguration)'
+      displayName: 'Build with config: $(buildConfiguration)'
 
     - task: DotNetCoreCLI@2
-      displayName: "Test"
+      displayName: "Run Tests"
       inputs:
         command: test
         projects: 'tests/**/*.csproj'
         arguments: '--configuration $(BuildConfiguration) --no-build /p:CollectCoverage=true /p:IncludeTestAssembly=true /p:CoverletOutputFormat=opencover%2ccobertura /p:CoverletOutput=../../target/reports/coverage/'
     
     - task: UseDotNet@2 
-      displayName: ".NET Core 2.1 (for Sonar-Cloud)"
+      displayName: "Use .NET Core 2.1 (for Sonar-Cloud)"
       inputs:
         version: '2.0.x'
         packageType: runtime
     - task: SonarCloudAnalyze@1
+      displayName: 'Sonar-Cloud: analysis'
 
     - task: SonarCloudPublish@1
+      displayName: 'Sonar-Cloud: publish results'
       inputs:
         pollingTimeoutSec: '300'
 
     - task: UseDotNet@2 
-      displayName: ".NET Core 3.1.x"
+      displayName: "Use .NET Core 3.1"
       inputs:
         version: '3.1.x'
         packageType: sdk
         
     - task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
-      displayName: ReportGenerator
+      displayName: Generate coverage report
       inputs:
         reports: 'target/reports/coverage/coverage.opencover.xml'
         targetdir: 'target/reports/coverage'
@@ -61,14 +65,14 @@ steps:
         verbosity: 'Verbose'
 
     - task: PublishCodeCoverageResults@1
-      displayName: 'Publish code coverage results'
+      displayName: 'Publish coverage results'
       inputs:
         codeCoverageTool: Cobertura
         summaryFileLocation: '$(build.sourcesdirectory)/target/reports/coverage/coverage.cobertura.xml'
         reportDirectory: '$(build.sourcesdirectory)/target/reports/coverage'
 
     - task: DotNetCoreCLI@2
-      displayName: "Publish"
+      displayName: "Create build artifacts"
       inputs:
         command: 'publish'
         publishWebProjects: true
