@@ -10,6 +10,14 @@ variables:
 
 steps:
 
+    - task: SonarCloudPrepare@1
+      inputs:
+        SonarCloud: 'qlector-azurepipelines'
+        organization: 'madsciencist-github'
+        scannerMode: 'MSBuild'
+        projectKey: 'MadSciencist_QLector'
+        projectName: 'qlector'
+
     - task: UseDotNet@2 
       displayName: ".NET Core 3.1.x"
       inputs:
@@ -25,6 +33,12 @@ steps:
         projects: 'tests/**/*.csproj'
         arguments: '--configuration $(BuildConfiguration) --no-build /p:CollectCoverage=true /p:IncludeTestAssembly=true /p:CoverletOutputFormat=opencover%2ccobertura /p:CoverletOutput=../../target/reports/coverage/'
     
+    - task: SonarCloudAnalyze@1
+
+    - task: SonarCloudPublish@1
+      inputs:
+        pollingTimeoutSec: '300'
+
     - task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
       displayName: ReportGenerator
       inputs:
