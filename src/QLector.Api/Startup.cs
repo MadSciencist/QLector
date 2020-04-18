@@ -25,7 +25,7 @@ namespace QLector.Api
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        protected Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }

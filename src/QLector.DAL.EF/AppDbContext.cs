@@ -15,67 +15,67 @@ namespace QLector.DAL.EF
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<RolePermissionLink> RolePermissionLinks { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(builder);
+            base.OnModelCreating(modelBuilder);
 
-            builder.ApplyConfiguration(new UserConfiguration());
-            builder.ApplyConfiguration(new RoleConfiguration());
-            builder.ApplyConfiguration(new UserRoleConfiguration());
-            builder.ApplyConfiguration(new RolePermissionConfiguration());
-            builder.ApplyConfiguration(new PermissionConfiguration());
+            modelBuilder.ApplyConfiguration(new UserConfiguration());
+            modelBuilder.ApplyConfiguration(new RoleConfiguration());
+            modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
+            modelBuilder.ApplyConfiguration(new RolePermissionConfiguration());
+            modelBuilder.ApplyConfiguration(new PermissionConfiguration());
         }
     }
 
     public class UserConfiguration : IEntityTypeConfiguration<User>
     {
-        public void Configure(EntityTypeBuilder<User> configuration)
+        public void Configure(EntityTypeBuilder<User> builder)
         {
-            configuration.ToTable("Users");
-            configuration.HasKey(x => x.Id);
+            builder.ToTable("Users");
+            builder.HasKey(x => x.Id);
 
-            configuration.HasMany(x => x.UserRoleLinks).WithOne(x => x.User);
+            builder.HasMany(x => x.UserRoleLinks).WithOne(x => x.User);
 
-            var userRoleLinkNavigation = configuration.Metadata.FindNavigation(nameof(User.UserRoleLinks));
+            var userRoleLinkNavigation = builder.Metadata.FindNavigation(nameof(User.UserRoleLinks));
             userRoleLinkNavigation.SetPropertyAccessMode(PropertyAccessMode.Field);
         }
     }
 
     public class UserRoleConfiguration : IEntityTypeConfiguration<UserRoleLink>
     {
-        public void Configure(EntityTypeBuilder<UserRoleLink> configuration)
+        public void Configure(EntityTypeBuilder<UserRoleLink> builder)
         {
-            configuration.ToTable("LinkUserRole");
-            configuration.HasKey(x => new { x.UserId, x.RoleId });
-            configuration.HasOne(x => x.User).WithMany(x => x.UserRoleLinks).HasForeignKey(x => x.UserId);
+            builder.ToTable("LinkUserRole");
+            builder.HasKey(x => new { x.UserId, x.RoleId });
+            builder.HasOne(x => x.User).WithMany(x => x.UserRoleLinks).HasForeignKey(x => x.UserId);
         }
     }
 
     public class RoleConfiguration : IEntityTypeConfiguration<Role>
     {
-        public void Configure(EntityTypeBuilder<Role> configuration)
+        public void Configure(EntityTypeBuilder<Role> builder)
         {
-            configuration.ToTable("Roles");
-            configuration.HasKey(x => x.Id);
+            builder.ToTable("Roles");
+            builder.HasKey(x => x.Id);
         }
     }
 
     public class RolePermissionConfiguration : IEntityTypeConfiguration<RolePermissionLink>
     {
-        public void Configure(EntityTypeBuilder<RolePermissionLink> configuration)
+        public void Configure(EntityTypeBuilder<RolePermissionLink> builder)
         {
-            configuration.ToTable("LinkRolePermission");
-            configuration.HasKey(x => new { x.PermissionId, x.RoleId });
-            configuration.HasOne(x => x.Role).WithMany(x => x.RolePermissionLinks).HasForeignKey(x => x.RoleId);
+            builder.ToTable("LinkRolePermission");
+            builder.HasKey(x => new { x.PermissionId, x.RoleId });
+            builder.HasOne(x => x.Role).WithMany(x => x.RolePermissionLinks).HasForeignKey(x => x.RoleId);
         }
     }
 
     public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
     {
-        public void Configure(EntityTypeBuilder<Permission> configuration)
+        public void Configure(EntityTypeBuilder<Permission> builder)
         {
-            configuration.ToTable("Permissions");
-            configuration.HasKey(x => x.Id);
+            builder.ToTable("Permissions");
+            builder.HasKey(x => x.Id);
         }
     }
 }

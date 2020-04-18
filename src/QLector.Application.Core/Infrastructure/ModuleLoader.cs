@@ -45,7 +45,7 @@ namespace QLector.Application.Core.Infrastructure
                 }
                 catch (FileLoadException)
                 {
-                    continue;
+                    // Swallow?
                 }
             }
 
