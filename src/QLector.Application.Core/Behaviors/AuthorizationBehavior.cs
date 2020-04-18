@@ -54,7 +54,7 @@ namespace QLector.Application.Core.Behaviors
             var userId = idProperty.GetValue(appRequest.Data);
 
             if(userId is null)
-                throw new ArgumentNullException("User identifier is not provided!");
+                throw new ArgumentNullException("User identifier is not provided!", nameof(userId));
 
             if (!_authorizationService.HasPrincipalClaimedIdentifier(appRequest.Principal, userId))
             {

@@ -14,7 +14,7 @@ namespace QLector.Domain.Users
         private List<RolePermissionLink> _rolePermissionLinks;
         public IReadOnlyCollection<RolePermissionLink> RolePermissionLinks => _rolePermissionLinks.AsReadOnly();
 
-        public Role() { }
+        protected Role() { }
 
         public static Role Create(string name)
         {
@@ -33,7 +33,6 @@ namespace QLector.Domain.Users
         public void AddPermission(Permission permission)
         {
             // TODO
-
         }
     }
 }

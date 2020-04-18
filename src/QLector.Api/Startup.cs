@@ -1,31 +1,21 @@
 using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
+using QLector.Api.Extensions;
 using QLector.Api.Filters;
-using QLector.Application.Core;
 using QLector.Application.Core.Extensions;
 using QLector.DAL.EF;
 using QLector.Security;
-using Swashbuckle.AspNetCore.Swagger;
-using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using QLector.Domain.Core;
 
 namespace QLector.Api
 {
     public class Startup
     {
-        protected Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
@@ -40,40 +30,16 @@ namespace QLector.Api
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddFluentValidation(x => x.ImplicitlyValidateChildProperties = true);
 
-            ConfigureCustomErrorMessage(services)
+            services
+                .AddCustomErrorResponseMessage()
                 .AddHttpContextAccessor()
                 .AddApplicationLayer(Configuration)
                 .AddSecurity(Configuration)
                 .AddEntityFrameworkDataAccessImplementation(Configuration)
-                .AddSwaggerGen(o =>
-                {
-                    o.SwaggerDoc("v1", new OpenApiInfo { Title = "QLector.Api", Version = "v1" });
-                    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                    o.IncludeXmlComments(xmlPath);
-                    o.AddFluentValidationRules();
-                })
+                .AddSwagger()
                 .AddOptions()
-                .AddTransient<IStartupFilter, StartupConfigValidationFilter>()
-                .AddAuthentication(options =>
-                {
-                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                })
-                .AddJwtBearer(options =>
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        SaveSigninToken = true,
-                        ValidateIssuer = true,
-                        ValidateAudience = false,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = Configuration["Jwt:Issuer"],
-                        ValidAudience = Configuration["Jwt:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
-                        ClockSkew = TimeSpan.FromMinutes(0)
-                    }
-                );
+                .AddApiServices()
+                .AddJwt(Configuration);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -87,23 +53,6 @@ namespace QLector.Api
                 {
                     endpoints.MapControllers();
                 });
-        }
-
-        private static IServiceCollection ConfigureCustomErrorMessage(IServiceCollection services)
-        {
-            return services.Configure<ApiBehaviorOptions>(options =>
-            {
-                options.InvalidModelStateResponseFactory = context =>
-                {
-                    var result = new Response<object>();
-                    result.Messages.AddRange(context.ModelState
-                        .Where(x => !string.IsNullOrEmpty(x.Value.Errors.FirstOrDefault()?.ErrorMessage))
-                        .Select(x => Message.Error(x.Value.Errors.FirstOrDefault()?.ErrorMessage))
-                        .ToList());
-
-                    return new BadRequestObjectResult(result);
-                };
-            });
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using QLector.Domain.Core;
 using QLector.Domain.Users;
+using QLector.Domain.Users.Enumerations;
 using QLector.Domain.Users.Repositories;
 using QLector.Security.Dto;
 using QLector.Security.Exceptions;
@@ -10,21 +11,18 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using QLector.Domain.Users.Enumerations;
 
 namespace QLector.Security
 {
     public class UserService : IUserService
     {
-        private readonly IUnitOfWork _unitOfWork;
         private readonly ITokenBuilder _tokenBuilder;
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly IUserRepository _userRepository;
         private readonly IRoleRepository _roleRepository;
 
-        public UserService(IUnitOfWork unitOfWork, ITokenBuilder tokenBuilder, IPasswordHasher<User> passwordHasher, IUserRepository userRepository, IRoleRepository roleRepository)
+        public UserService(ITokenBuilder tokenBuilder, IPasswordHasher<User> passwordHasher, IUserRepository userRepository, IRoleRepository roleRepository)
         {
-            _unitOfWork = unitOfWork ?? throw new ArgumentException(nameof(unitOfWork));
             _tokenBuilder = tokenBuilder ?? throw new ArgumentNullException(nameof(tokenBuilder));
             _passwordHasher = passwordHasher ?? throw new ArgumentNullException(nameof(passwordHasher));
             _userRepository = userRepository ?? throw new ArgumentException(nameof(userRepository));
@@ -52,7 +50,7 @@ namespace QLector.Security
 
                 user.SignIn();
                 await _userRepository.Update(user);
-                await _unitOfWork.Commit();
+                await _userRepository.UnitOfWork.Commit();
 
                 return new TokenDto
                 {
@@ -64,7 +62,7 @@ namespace QLector.Security
             }
             catch (Exception)
             {
-                await _unitOfWork.Rollback();
+                await _userRepository.UnitOfWork.Rollback();
                 throw;
             }
         }
@@ -100,7 +98,7 @@ namespace QLector.Security
             return claims;
         }
 
-        public async Task<UserProfileDto> Register(RegisterDto registerDto, string role = Roles.Default)
+        public async Task<UserProfileDto> Register(RegisterDto registerDto, string role)
         {
             var alreadyExistingUser = await _userRepository.FindByUserName(registerDto.UserName.ToUpperInvariant());
 
@@ -118,13 +116,13 @@ namespace QLector.Security
                 var roleEntity = await _roleRepository.FindByName(role);
                 user.AddToRole(roleEntity);
                 await _userRepository.Add(user);
-                await _unitOfWork.Commit();
+                await _userRepository.UnitOfWork.Commit();
 
                 return new UserProfileDto(user.Id, user.UserName, user.Email, user.Created);
             }
             catch (Exception)
             {
-                await _unitOfWork?.Rollback();
+                await _userRepository.UnitOfWork.Rollback();
                 throw;
             }
         }
@@ -142,7 +140,7 @@ namespace QLector.Security
                 
                 var removed = user.RemoveRole(role);
 
-                await _unitOfWork.Commit();
+                await _userRepository.UnitOfWork.Commit();
 
                 var response = new GenericResponse<object>(new object(), removed);
                 if (removed)
@@ -153,30 +151,30 @@ namespace QLector.Security
             }
             catch (Exception)
             {
-                await _unitOfWork?.Rollback();
+                await _userRepository.UnitOfWork.Rollback();
                 throw;
             }
         }
 
-        public async Task<GenericResponse<object>> AddRole(AddRemoveRoleDto addRoleDto)
+        public async Task<GenericResponse<object>> AddRole(AddRemoveRoleDto addRemoveRoleDto)
         {
             try
             {
-                var user = await _userRepository.FindById(addRoleDto.UserId);
+                var user = await _userRepository.FindById(addRemoveRoleDto.UserId);
 
                 if (user is null)
                     return new GenericResponse<object>(new object(), false).AddErrorMessage("User doesn't exists");
 
-                var role = await _roleRepository.FindById(addRoleDto.RoleId);
+                var role = await _roleRepository.FindById(addRemoveRoleDto.RoleId);
 
                 user.AddToRole(role);
 
-                await _unitOfWork.Commit();
+                await _userRepository.UnitOfWork.Commit();
                 return new GenericResponse<object>(new object()).AddInfoMessage("Successfully added");
             }
             catch (Exception)
             {
-                await _unitOfWork?.Rollback();
+                await _userRepository.UnitOfWork.Rollback();
                 throw;
             }
         }

@@ -2,6 +2,7 @@
 
 namespace QLector.Domain.Core
 {
+    [Serializable]
     public class DomainException : Exception
     {
         public DomainException()

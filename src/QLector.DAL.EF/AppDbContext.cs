@@ -33,11 +33,9 @@ namespace QLector.DAL.EF
         {
             builder.ToTable("Users");
             builder.HasKey(x => x.Id);
-
+            builder.Ignore(x => x.Roles); // We are using UserRoleLinks, Roles property is for domain logic purposes
             builder.HasMany(x => x.UserRoleLinks).WithOne(x => x.User);
-
-            var userRoleLinkNavigation = builder.Metadata.FindNavigation(nameof(User.UserRoleLinks));
-            userRoleLinkNavigation.SetPropertyAccessMode(PropertyAccessMode.Field);
+            builder.Metadata.FindNavigation(nameof(User.UserRoleLinks)).SetPropertyAccessMode(PropertyAccessMode.Field);
         }
     }
 
@@ -48,6 +46,7 @@ namespace QLector.DAL.EF
             builder.ToTable("LinkUserRole");
             builder.HasKey(x => new { x.UserId, x.RoleId });
             builder.HasOne(x => x.User).WithMany(x => x.UserRoleLinks).HasForeignKey(x => x.UserId);
+            builder.HasOne(x => x.Role).WithMany(x => x.UserRoleLinks).HasForeignKey(x => x.RoleId);
         }
     }
 

@@ -2,6 +2,7 @@
 
 namespace QLector.Security.Exceptions
 {
+    [Serializable]
     public class UserCreationException : Exception
     {
         public UserCreationException()

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using QLector.Application.Core;
+using QLector.Domain.Users.Enumerations;
 using QLector.Security;
 using QLector.Security.Dto;
 using QLector.Security.Exceptions;
@@ -27,7 +28,7 @@ namespace QLector.Application.Users.Register
             try
             {
                 var registerDto = Mapper.Map<RegisterDto>(request.Data);
-                var user = await _userService.Register(registerDto);
+                var user = await _userService.Register(registerDto, Roles.Default);
 
                 Logger.LogInformation("User created! {@user}", user);
 

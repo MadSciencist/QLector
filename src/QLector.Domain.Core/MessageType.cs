@@ -2,6 +2,9 @@
 
 namespace QLector.Domain.Core
 {
+    /// <summary>
+    /// Type of the message
+    /// </summary>
     public enum MessageType : byte
     {
         [EnumMember(Value = "error")]

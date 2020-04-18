@@ -44,7 +44,7 @@ namespace QLector.DAL.EF.Repository
         public virtual Task Remove(TEntity entity)
         {
             Context.Remove(entity);
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
 
         public async Task<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
@@ -52,7 +52,7 @@ namespace QLector.DAL.EF.Repository
             return await Context.Set<TEntity>().FirstOrDefaultAsync(predicate);
         }
 
-        public async Task<IEnumerable<TEntity>> GetManyFiltered(Expression<Func<TEntity, bool>> predicate)
+        public async Task<IEnumerable<TEntity>> FindMany(Expression<Func<TEntity, bool>> predicate)
         {
             return await Context.Set<TEntity>().Where(predicate).ToListAsync();
         }

@@ -1,7 +1,7 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using QLector.Domain.Users;
 using QLector.Domain.Users.Repositories;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,7 +30,7 @@ namespace QLector.DAL.EF.Repository.Users
                 .Include(x => x.UserRoleLinks)
                 .FirstOrDefaultAsync(x => x.UserName == username);
 
-            var roleIds = user.UserRoleLinks.Select(x => x.RoleId);
+            var roleIds = user.Roles.Select(x => x.Id);
 
             return await Context.RolePermissionLinks
                 .AsNoTracking()

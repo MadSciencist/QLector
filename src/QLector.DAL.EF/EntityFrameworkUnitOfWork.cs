@@ -9,27 +9,27 @@ namespace QLector.DAL.EF
 {
     public class EntityFrameworkUnitOfWork : IUnitOfWork
     {
-        public Guid TransactionId { get; }
+        public Guid OperationId { get; }
 
-        private readonly ILogger<EntityFrameworkUnitOfWork> _logger;
-        private readonly AppDbContext _dbContext;
+        protected readonly ILogger<EntityFrameworkUnitOfWork> Logger;
+        protected readonly AppDbContext DbContext;
 
         public EntityFrameworkUnitOfWork(AppDbContext context, ILogger<EntityFrameworkUnitOfWork> logger)
         {
-            _dbContext = context ?? throw new ArgumentNullException(nameof(context));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            TransactionId = Guid.NewGuid();
+            DbContext = context ?? throw new ArgumentNullException(nameof(context));
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            OperationId = Guid.NewGuid();
         }
 
         public async Task Commit(CancellationToken cancellationToken = default(CancellationToken) )
         {
             try
             {
-                await _dbContext.SaveChangesAsync(cancellationToken);
+                await DbContext.SaveChangesAsync(cancellationToken);
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, nameof(Commit));
+                Logger.LogError(ex, nameof(Commit));
                 throw;
             }
         }
@@ -42,13 +42,13 @@ namespace QLector.DAL.EF
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, nameof(Rollback));
+                Logger.LogError(ex, nameof(Rollback));
             }
         }
 
-        private Task DoRollback()
+        protected virtual Task DoRollback()
         {
-            foreach (var entry in _dbContext.ChangeTracker.Entries())
+            foreach (var entry in DbContext.ChangeTracker.Entries())
             {
                 switch (entry.State)
                 {
@@ -62,9 +62,6 @@ namespace QLector.DAL.EF
 
                     case EntityState.Deleted:
                         entry.Reload();
-                        break;
-
-                    default:
                         break;
                 }
             }

@@ -4,10 +4,13 @@ using System.Reflection;
 
 namespace QLector.Application.Core
 {
+    /// <summary>
+    /// Represents application module
+    /// </summary>
     public interface IApplicationModule
     {
         /// <summary>
-        /// Module main assembly
+        /// Module assembly
         /// </summary>
         Assembly Assembly { get; }
 

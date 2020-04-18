@@ -16,8 +16,7 @@ namespace QLector.Api.Controllers
         protected virtual PagedQueryRequest<TRequest, TResponse> CreateQuery<TRequest, TResponse>(TRequest request, PagerBindModel pagerBindModel)
         {
             var user = HttpContext.User;
-            var pagedQueryRequest = new PagedQueryRequest<TRequest, TResponse>(request, user);
-            pagedQueryRequest.CreatePager(pagerBindModel.Page, pagerBindModel.PageSize);
+            var pagedQueryRequest = new PagedQueryRequest<TRequest, TResponse>(request, user, pagerBindModel.Page, pagerBindModel.PageSize);
             return pagedQueryRequest;
         }
 

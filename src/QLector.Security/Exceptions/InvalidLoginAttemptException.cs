@@ -2,6 +2,7 @@
 
 namespace QLector.Security.Exceptions
 {
+    [Serializable]
     public class InvalidLoginAttemptException : Exception
     {
         public InvalidLoginAttemptException()

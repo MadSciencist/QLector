@@ -23,9 +23,17 @@ namespace QLector.Domain.Users
 
         private List<UserRoleLink> _userRoleLinks;
         public IReadOnlyCollection<UserRoleLink> UserRoleLinks => _userRoleLinks;
+        public IReadOnlyCollection<Role> Roles => UserRoleLinks?.Select(x => x.Role).ToList().AsReadOnly();
 
-        public User() { }
+        protected User() { }
 
+        /// <summary>
+        /// Factory method to create new user
+        /// </summary>
+        /// <param name="username">User login</param>
+        /// <param name="email">User email</param>
+        /// <param name="password">User password (hashed)</param>
+        /// <returns></returns>
         public static User Create(string username, string email, string password)
         {
             if (string.IsNullOrWhiteSpace(username))
@@ -49,10 +57,14 @@ namespace QLector.Domain.Users
             };
         }
 
+        /// <summary>
+        /// Add to specified role
+        /// </summary>
+        /// <param name="role">Role to add</param>
         public void AddToRole(Role role)
         {
             if (role is null)
-                throw new DomainException("Role doesnt exists!");
+                throw new DomainException("Role doesn't exists!");
 
             if (_userRoleLinks is null)
                 _userRoleLinks = new List<UserRoleLink>();
@@ -63,10 +75,15 @@ namespace QLector.Domain.Users
             _userRoleLinks.Add(new UserRoleLink { Role = role });
         }
 
+        /// <summary>
+        /// Removes from specified role
+        /// </summary>
+        /// <param name="role">Role to remove</param>
+        /// <returns></returns>
         public bool RemoveRole(Role role)
         {
             if (role is null)
-                throw new DomainException("Role doesnt exists!");
+                throw new DomainException("Role doesn't exists!");
 
             var toRemove = _userRoleLinks.FirstOrDefault(x => x.RoleId == role.Id);
 
@@ -76,6 +93,9 @@ namespace QLector.Domain.Users
             return _userRoleLinks.Remove(toRemove);
         }
 
+        /// <summary>
+        /// Sign in the user
+        /// </summary>
         public void SignIn()
         {
             LastLogged = DateTime.UtcNow;
